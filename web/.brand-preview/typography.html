@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Typography picker — FlowRail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" />
+  <style id="palette-tokens"></style>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(12px);
+      background: color-mix(in oklch, var(--bg) 85%, transparent);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .topbar h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .topbar .hint { font-size: 13px; opacity: 0.66; margin: 4px 0 0; }
+    .toggle {
+      border: 1px solid var(--border); background: transparent; color: var(--fg);
+      padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+      min-height: 40px; flex-shrink: 0;
+    }
+    .toggle:hover { background: color-mix(in oklch, var(--fg) 6%, transparent); }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 32px 24px 80px; display: grid; gap: 28px; }
+
+    .pair {
+      border-radius: 16px; background: var(--card); border: 1px solid var(--border);
+      padding: 28px 32px; color: var(--card-fg);
+    }
+    .pair-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .pair-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 999px; flex-shrink: 0;
+      background: var(--primary); color: var(--primary-fg); font-weight: 600; font-size: 13px;
+    }
+    .pair-name { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+    .pair-fonts { margin-left: auto; font-size: 11px; opacity: 0.66; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+
+    .sample-display {
+      font-family: var(--pair-serif, var(--pair-sans));
+      font-size: 38px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.08;
+      margin: 0 0 18px; text-wrap: balance;
+    }
+    .sample-h1 {
+      font-family: var(--pair-sans); font-size: 21px; font-weight: 600;
+      letter-spacing: -0.01em; margin: 0 0 8px;
+    }
+    .sample-body {
+      font-family: var(--pair-sans); font-size: 14px; line-height: 1.6;
+      margin: 0 0 20px; opacity: 0.86; max-width: 62ch;
+    }
+    .sample-caption {
+      font-family: var(--pair-sans); font-size: 11px; opacity: 0.6;
+      text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 6px;
+    }
+    .sample-number {
+      font-family: var(--pair-sans); font-size: 26px; font-weight: 600;
+      font-variant-numeric: tabular-nums; margin: 0; letter-spacing: -0.02em;
+    }
+    .sample-addr {
+      font-family: var(--pair-mono); font-size: 12px; opacity: 0.78; margin: 6px 0 0;
+    }
+    .sample-button {
+      font-family: var(--pair-sans); font-size: 13px; font-weight: 500;
+      padding: 10px 18px; background: var(--primary); color: var(--primary-fg);
+      border: none; border-radius: var(--radius); cursor: pointer; margin-top: 14px;
+      min-height: 40px;
+    }
+    .sample-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 720px) { .sample-grid { grid-template-columns: 1fr; } .sample-display { font-size: 30px; } }
+    .sample-card {
+      padding: 16px 18px; background: color-mix(in oklch, var(--fg) 5%, transparent);
+      border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .tiers { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .tier {
+      font-family: var(--pair-sans); font-size: 12px; padding: 6px 12px;
+      border-radius: 999px; border: 1px solid var(--border);
+      background: color-mix(in oklch, var(--fg) 4%, transparent);
+    }
+    .tier b { font-variant-numeric: tabular-nums; }
+    .footer-cta { text-align: center; padding: 24px; opacity: 0.72; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <h1>Typography picker — FlowRail</h1>
+      <p class="hint">On your Mercury Warm palette. Inter and JetBrains Mono are excluded by your request.</p>
+    </div>
+    <button class="toggle" id="theme-toggle">Switch to Light</button>
+  </div>
+
+  <div class="container">
+
+    <article class="pair" style="--pair-sans: 'Geist', system-ui, sans-serif; --pair-mono: 'Geist Mono', ui-monospace, monospace;">
+      <header class="pair-header">
+        <span class="pair-number">1</span>
+        <h2 class="pair-name">Geist + Geist Mono</h2>
+        <span class="pair-fonts">technical · modern · neutral</span>
+      </header>
+      <h1 class="sample-display">40 payees. One signature.</h1>
+      <h2 class="sample-h1">FlowRail</h2>
+      <p class="sample-body">Payout operations for businesses on Tempo. Fixed rules decide when money leaves, who gets it, and who approved it.</p>
+      <div class="sample-grid">
+        <div>
+          <p class="sample-caption">Payout run</p>
+          <p class="sample-number">$2,500.00</p>
+          <p class="sample-addr">0x742d35Cc…e7595f0bEbb</p>
+          <button class="sample-button">Approve &amp; run</button>
+        </div>
+        <div class="sample-card">
+          <p class="sample-caption">Approval mix</p>
+          <p class="sample-number" style="font-size: 20px;">39 auto · 1 finance</p>
+          <div class="tiers">
+            <span class="tier">Auto <b>39</b></span>
+            <span class="tier">Finance <b>1</b></span>
+            <span class="tier">Dual <b>0</b></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="pair" style="--pair-sans: 'IBM Plex Sans', system-ui, sans-serif; --pair-mono: 'IBM Plex Mono', ui-monospace, monospace;">
+      <header class="pair-header">
+        <span class="pair-number">2</span>
+        <h2 class="pair-name">IBM Plex Sans + Plex Mono</h2>
+        <span class="pair-fonts">serious · technical · enterprise</span>
+      </header>
+      <h1 class="sample-display">40 payees. One signature.</h1>
+      <h2 class="sample-h1">FlowRail</h2>
+      <p class="sample-body">Payout operations for businesses on Tempo. Fixed rules decide when money leaves, who gets it, and who approved it.</p>
+      <div class="sample-grid">
+        <div>
+          <p class="sample-caption">Payout run</p>
+          <p class="sample-number">$2,500.00</p>
+          <p class="sample-addr">0x742d35Cc…e7595f0bEbb</p>
+          <button class="sample-button">Approve &amp; run</button>
+        </div>
+        <div class="sample-card">
+          <p class="sample-caption">Approval mix</p>
+          <p class="sample-number" style="font-size: 20px;">39 auto · 1 finance</p>
+          <div class="tiers">
+            <span class="tier">Auto <b>39</b></span>
+            <span class="tier">Finance <b>1</b></span>
+            <span class="tier">Dual <b>0</b></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="pair" style="--pair-sans: 'DM Sans', system-ui, sans-serif; --pair-mono: 'DM Mono', ui-monospace, monospace;">
+      <header class="pair-header">
+        <span class="pair-number">3</span>
+        <h2 class="pair-name">DM Sans + DM Mono</h2>
+        <span class="pair-fonts">warm · approachable · clear</span>
+      </header>
+      <h1 class="sample-display">40 payees. One signature.</h1>
+      <h2 class="sample-h1">FlowRail</h2>
+      <p class="sample-body">Payout operations for businesses on Tempo. Fixed rules decide when money leaves, who gets it, and who approved it.</p>
+      <div class="sample-grid">
+        <div>
+          <p class="sample-caption">Payout run</p>
+          <p class="sample-number">$2,500.00</p>
+          <p class="sample-addr">0x742d35Cc…e7595f0bEbb</p>
+          <button class="sample-button">Approve &amp; run</button>
+        </div>
+        <div class="sample-card">
+          <p class="sample-caption">Approval mix</p>
+          <p class="sample-number" style="font-size: 20px;">39 auto · 1 finance</p>
+          <div class="tiers">
+            <span class="tier">Auto <b>39</b></span>
+            <span class="tier">Finance <b>1</b></span>
+            <span class="tier">Dual <b>0</b></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="pair" style="--pair-sans: 'Manrope', system-ui, sans-serif; --pair-mono: 'IBM Plex Mono', ui-monospace, monospace; --pair-serif: 'Instrument Serif', Georgia, serif;">
+      <header class="pair-header">
+        <span class="pair-number">4</span>
+        <h2 class="pair-name">Instrument Serif + Manrope</h2>
+        <span class="pair-fonts">editorial · premium · distinctive</span>
+      </header>
+      <h1 class="sample-display">40 payees. One signature.</h1>
+      <h2 class="sample-h1">FlowRail</h2>
+      <p class="sample-body">Payout operations for businesses on Tempo. Fixed rules decide when money leaves, who gets it, and who approved it.</p>
+      <div class="sample-grid">
+        <div>
+          <p class="sample-caption">Payout run</p>
+          <p class="sample-number">$2,500.00</p>
+          <p class="sample-addr">0x742d35Cc…e7595f0bEbb</p>
+          <button class="sample-button">Approve &amp; run</button>
+        </div>
+        <div class="sample-card">
+          <p class="sample-caption">Approval mix</p>
+          <p class="sample-number" style="font-size: 20px;">39 auto · 1 finance</p>
+          <div class="tiers">
+            <span class="tier">Auto <b>39</b></span>
+            <span class="tier">Finance <b>1</b></span>
+            <span class="tier">Dual <b>0</b></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="pair" style="--pair-sans: 'Space Grotesk', system-ui, sans-serif; --pair-mono: 'Space Mono', ui-monospace, monospace;">
+      <header class="pair-header">
+        <span class="pair-number">5</span>
+        <h2 class="pair-name">Space Grotesk + Space Mono</h2>
+        <span class="pair-fonts">technical · confident · sharp</span>
+      </header>
+      <h1 class="sample-display">40 payees. One signature.</h1>
+      <h2 class="sample-h1">FlowRail</h2>
+      <p class="sample-body">Payout operations for businesses on Tempo. Fixed rules decide when money leaves, who gets it, and who approved it.</p>
+      <div class="sample-grid">
+        <div>
+          <p class="sample-caption">Payout run</p>
+          <p class="sample-number">$2,500.00</p>
+          <p class="sample-addr">0x742d35Cc…e7595f0bEbb</p>
+          <button class="sample-button">Approve &amp; run</button>
+        </div>
+        <div class="sample-card">
+          <p class="sample-caption">Approval mix</p>
+          <p class="sample-number" style="font-size: 20px;">39 auto · 1 finance</p>
+          <div class="tiers">
+            <span class="tier">Auto <b>39</b></span>
+            <span class="tier">Finance <b>1</b></span>
+            <span class="tier">Dual <b>0</b></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="pair" style="--pair-sans: 'DM Sans', system-ui, sans-serif; --pair-mono: 'IBM Plex Mono', ui-monospace, monospace; --pair-serif: 'Fraunces', Georgia, serif;">
+      <header class="pair-header">
+        <span class="pair-number">6</span>
+        <h2 class="pair-name">Fraunces + DM Sans</h2>
+        <span class="pair-fonts">warm · editorial · premium</span>
+      </header>
+      <h1 class="sample-display">40 payees. One signature.</h1>
+      <h2 class="sample-h1">FlowRail</h2>
+      <p class="sample-body">Payout operations for businesses on Tempo. Fixed rules decide when money leaves, who gets it, and who approved it.</p>
+      <div class="sample-grid">
+        <div>
+          <p class="sample-caption">Payout run</p>
+          <p class="sample-number">$2,500.00</p>
+          <p class="sample-addr">0x742d35Cc…e7595f0bEbb</p>
+          <button class="sample-button">Approve &amp; run</button>
+        </div>
+        <div class="sample-card">
+          <p class="sample-caption">Approval mix</p>
+          <p class="sample-number" style="font-size: 20px;">39 auto · 1 finance</p>
+          <div class="tiers">
+            <span class="tier">Auto <b>39</b></span>
+            <span class="tier">Finance <b>1</b></span>
+            <span class="tier">Dual <b>0</b></span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="footer-cta">Pick 1–6 in the chat. Tell me the name if you want to change direction instead.</div>
+  </div>
+
+  <script>
+    const dark = `--bg: oklch(16.00% 0.012 70); --fg: oklch(96.00% 0.010 70);
+      --card: oklch(21.00% 0.016 70); --card-fg: oklch(96.00% 0.010 70);
+      --primary: oklch(74.00% 0.150 65); --primary-fg: oklch(18.00% 0.030 65);
+      --border: oklch(37.00% 0.030 70); --radius: 10px;`;
+    const light = `--bg: oklch(98.50% 0.005 75); --fg: oklch(20.00% 0.015 70);
+      --card: oklch(100% 0 0); --card-fg: oklch(20.00% 0.015 70);
+      --primary: oklch(45.00% 0.140 60); --primary-fg: oklch(100% 0 0);
+      --border: oklch(87.50% 0.012 75); --radius: 10px;`;
+    const root = document.documentElement;
+    const btn = document.getElementById('theme-toggle');
+    function apply(t) {
+      document.getElementById('palette-tokens').textContent = `:root { ${t === 'dark' ? dark : light} }`;
+      root.setAttribute('data-theme', t);
+      btn.textContent = t === 'dark' ? 'Switch to Light' : 'Switch to Dark';
+    }
+    apply('dark');
+    btn.addEventListener('click', () => apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+  </script>
+</body>
+</html>
