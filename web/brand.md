@@ -83,9 +83,9 @@ Verified against the tokens actually written to `globals.css` (not the generator
 
 **Known limitation:** `border` against `background` is 1.40:1 light / 1.85:1 dark. Borders are **decorative only** in this palette. Never use border color alone to convey state, focus, or validity — pair it with a text change, a ring, or an icon.
 
-## Typography — Source Sans 3 + Newsreader
+## Typography — IBM Plex Sans + Newsreader
 
-- **Body + UI:** Source Sans 3 (variable)
+- **Body + UI:** IBM Plex Sans. Source Sans 3 was dropped because it reads like Segoe UI.
 - **Display + headings:** Newsreader (optical size, variable)
 
 Wired via `next/font/google` in `src/app/layout.tsx`. CSS variables: `--font-sans`, `--font-serif`.
@@ -94,7 +94,7 @@ Wired via `next/font/google` in `src/app/layout.tsx`. CSS variables: `--font-san
 
 ### Handling what used to be mono
 
-Addresses, hashes, key selectors, and chain IDs are set in **Source Sans 3 with `tabular-nums`**. Never set them in Newsreader — serif strokes make a long address hard to scan.
+Addresses, hashes, key selectors, and chain IDs are set in **IBM Plex Sans with `tabular-nums`**. Never set them in Newsreader — serif strokes make a long address hard to scan.
 
 ### Weight rule for the serif
 
@@ -113,7 +113,7 @@ Newsreader has real weights. Still keep display headings at 400 or 500. Do not p
 | Small / caption | `text-xs uppercase tracking-[0.16em]` | Eyebrows, status labels |
 | Numerals | `tabular-nums` | Amounts, chain IDs, counts |
 
-Money and counters use Source Sans 3 with `tabular-nums`.
+Money and counters use IBM Plex Sans with `tabular-nums`.
 
 ## Gradients (not used)
 
@@ -145,7 +145,7 @@ Hype words — revolutionary, game-changing, unleash, supercharge, unlock. Emoji
 - Keep the 4 px spacing grid.
 - Keep light and dark mode genuinely separate — both token sets are first-class, and the site ships a user-facing toggle (`src/components/theme-toggle.tsx`).
 - Use `tabular-nums` on any number that updates in place.
-- Set addresses, selectors, hashes, and chain IDs in Source Sans 3 with `tabular-nums` — never the serif, never a mono.
+- Set addresses, selectors, hashes, and chain IDs in IBM Plex Sans with `tabular-nums` — never the serif, never a mono.
 - Test every component in both modes before calling it done.
 
 **Don't:**

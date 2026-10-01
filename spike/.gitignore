@@ -1,0 +1,6 @@
+# Agent key material and evidence artifacts. Never commit these.
+.data/
+out/
+node_modules/
+dist/
+*.log

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Newsreader, Source_Sans_3 } from "next/font/google";
+import { IBM_Plex_Sans, Newsreader } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-const sourceSans = Source_Sans_3({
+const plexSans = IBM_Plex_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 const newsreader = Newsreader({
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${sourceSans.variable} ${newsreader.variable} h-full`}
+      className={`${plexSans.variable} ${newsreader.variable} h-full`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground antialiased">
         <ThemeProvider>{children}</ThemeProvider>

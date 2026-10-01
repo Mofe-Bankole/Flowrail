@@ -73,7 +73,7 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
 }
 
 @layer base {

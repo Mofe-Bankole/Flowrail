@@ -1,142 +1,184 @@
 # FlowRail — Build Spec (v1)
 
-Status: agreed direction, pre-implementation
-Team: Daniel Asaboro · Mofe · Pizelxx
-Chain: **Tempo only.** Solana and AI features are out of scope.
+**WARNING: This spec is partially superseded.** Protocol facts are now authoritative in:
+
+- `docs/PROTOCOL.md` — what is **actually deployed** on Moderato (42431).
+- `docs/SECURITY.md` — security and what FlowRail **cannot** do.
+- `docs/PRODUCT.md` — honest product claims (reconstruction; needs user confirmation).
+
+Read those first. This file is preserved as the historical agreement; **where it conflicts,
+the `docs/` files win.**
+
+**Status:** agreed direction · Team: Daniel Asaboro · Mofe · Pizelxx · **Chain:** Tempo only.
+Solana and AI features are out of scope.
+
+---
 
 ## 1. What FlowRail is
 
-A payout operations layer for businesses that pay many people on Tempo. An agency receives a client payment. Fixed, rule-based policies then decide when money leaves, who gets it, and who approved it. Every payout carries a reference and an approval record anyone can check.
+A payout-operations layer for agencies that pay many people on Tempo. One customer approval
+produces a fleet of per-recipient access keys, each capped to that recipient's amount and killed
+by a short expiry. Every payout is memo-tagged and linkable to on-chain proof.
 
 The product is **the rules that govern payouts**, not a wallet or a checkout.
+
+---
 
 ## 2. Decisions
 
 | Decision | Choice |
 |---|---|
-| Network | **Moderato testnet**, chain ID `42431` (mainnet deferred) |
-| Root key custody | **Customer-held passkey** (P256/WebAuthn, domain-bound, stays on the customer's device). Fallback: Tempo Wallet. |
-| Policy enforcement | Off-chain policy engine that follows fixed rules, plus scoped access keys the protocol enforces |
+| Network | **Moderato testnet**, chain id `42431` (mainnet deferred) |
+| Root key custody | **Customer-held passkey** (P256/WebAuthn, domain-bound). For the spike CLI only: a throwaway local secp256k1 key in `.data/` (gitignored). |
+| Policy enforcement | Off-chain policy engine that follows fixed rules, plus **protocol-enforced scopes and absolute caps**. |
 | Custom Solidity | **None in v1** |
-| Stack | TypeScript everywhere (`viem`, `wagmi`, `ox`), Postgres |
+| Stack | TypeScript (`viem@2.57.2`, `accounts@0.19.0`, `ox`). File-backed storage for the spike; Postgres later. |
+| Period budgets | **Lifetime absolute caps.** No rolling spend-period window is assumed. See `docs/PROTOCOL.md` §1. |
 
-### Network details
+---
+
+## 3. Network details
 
 | Property | Value |
 |---|---|
 | RPC | `https://rpc.moderato.tempo.xyz` |
-| WebSocket | `wss://rpc.moderato.tempo.xyz` |
 | Explorer | `https://explore.testnet.tempo.xyz` |
 | Faucet | `cast rpc tempo_fundAddress <ADDRESS> --rpc-url https://rpc.moderato.tempo.xyz` |
 
-Testnet tokens (6 decimals): pathUSD `0x20c0…0000`, AlphaUSD `0x20c0…0001`, BetaUSD `0x20c0…0002`, ThetaUSD `0x20c0…0003`.
+Testnet stablecoins (6 decimals): pathUSD `0x20c0000000000000000000000000000000000000`,
+AlphaUSD `0x20c0…0001`, BetaUSD `0x20c0…0002`, ThetaUSD `0x20c0…0003`.
 
-## 3. Architecture
+---
+
+## 4. Architecture
 
 | Plane | Contents | Rule |
 |---|---|---|
-| Control (FlowRail) | Payees, policies, budgets, approvals, reconciliation, audit | Never holds key material that can act on its own |
-| Execution (FlowRail) | Scoped access keys, transaction builder | Can only use keys the customer has authorized, and only within their limits |
-| Settlement (Tempo) | TIP-20, payment lanes, Tempo Transactions, Account Keychain | Enforced by the protocol |
+| Control (FlowRail) | Payees, policies, approvals, reconciliation, audit | Never holds key material that can act on its own. |
+| Execution (FlowRail) | Scoped access keys, transaction builder | Can only use keys the customer has authorized, and only within their limits. |
+| Settlement (Tempo) | TIP-20, Account Keychain | Enforced by the protocol. |
 
-**Core rule:** If the server is compromised, an attacker can misuse an existing authorization but cannot create a new one. The root key lives only on the customer's device, and only the root key can create keys, add recipients, or raise limits.
+**Core rule:** If the server is compromised, an attacker can misuse an existing authorization, but
+cannot create a new one. The root key lives only on the customer's device. Revocation of a live
+key is **customer-triggered only**; FlowRail cannot revoke on the customer's behalf.
 
-## 4. Tempo primitives used
+---
+
+## 5. Tempo primitives used
 
 | Primitive | Purpose in FlowRail |
 |---|---|
-| TIP-20 `transferWithMemo` (32 bytes) | Each payout carries its invoice/period reference |
-| Virtual addresses | Each invoice has its own deposit address, so incoming payments identify themselves |
-| Payment lanes | Reserved blockspace keeps payroll fees predictable |
-| Stablecoin fees + fee sponsorship | Payees never handle gas; FlowRail pays it |
-| Batching | All payouts in a run succeed or fail together |
-| Scheduling (`valid_after` / `valid_before`) | Runs execute in a set time window without a cron bot |
-| Access keys: recipient scopes (TIP-1011) | A key can only pay the addresses listed in it |
-| Access keys: periodic `TokenLimit` | Period budget is enforced on-chain and resets automatically |
-| `witness` + burned set (TIP-1053) | Ties a key to a specific authorization artifact; can be revoked before use |
-| Passkeys (P256/WebAuthn) | Customer approves with Face ID; no seed phrase |
+| TIP-20 `transferWithMemo` (32 bytes) | Tags each payout to its intended payee and invoice reference. |
+| Access keys: recipient scopes | A key can only pay listed recipients. Scoping is a **separate** transaction (`setAllowedCalls`). See `docs/SECURITY.md` §3. |
+| Access keys: **absolute caps** (per token) | Lifetime cap enforced on-chain. No period window is used on Moderato. |
+| Key expiry | Short TTL (12h/7d) enforced on-chain; primary containment mechanism. |
+| Witness (TIP-1053) | Binds a signed authorization to context; burning invalidates a *signed-but-unsubmitted* authorization only — **not** a live-key kill switch. |
+| Passkeys (P256/WebAuthn) | Customer approves with device credentials. |
 
-Not used: StablecoinDEX / Fee AMM, MPP / payment channels, privacy transactions, EIP-7702 delegation.
+**What we explicitly do NOT rely on:** rolling `period` budgets, the canonical
+7-parameter `authorizeKey` with scopes-in-one-call, `getRemainingLimitWithPeriod`,
+or an admin-controlled runtime kill switch.
 
-### ABI and deployment status (verified 2026-09-30)
+### ABI and deployment status (VERIFIED 2026-10-01)
 
-- TIP-1011 is live on **mainnet at T3**; TIP-1053 is live on **mainnet at T5**. Access keys are therefore treated as a post-T3 surface.
-- Modern `authorizeKey` selector: `0x980a6025`. The legacy selector `0x54063a55` is the pre-T3 form. The flattened-variant encoding (which hashes to `0x203e2736`) is **rejected** — do not hand-roll argument encoding, use the first-party SDK.
-- Period budgets read through `getRemainingLimitWithPeriod`. Never compute remaining budget locally.
-- Account precompile: `0xAAAAAAAA00000000000000000000000000000000`.
+- **Deployed `authorizeKey`:** `0x54063a55` — signature `(address,uint8,uint64,bool,(address,uint256)[])`. No period field. No scopes-in-call.
+- **Canonical (not deployed on Moderato):** `0x203e2736` includes period/scopes; **not recognised**.
+- Account precompile: `0xAAAAAAAA00000000000000000000000000000000` (code `0xef`).
 - Signature types: `0` secp256k1, `1` raw P256, `2` WebAuthn.
-- SDK: first-party TypeScript SDK only.
-- **Unverified:** whether Moderato actually exposes T3/T5-era access keys and the TIP-1049 scheduling surface. Mainnet deployment status does not prove the separate Moderato deployment. This is the first thing the spike establishes.
+- **Do not hand-roll encoding.** Use `viem/tempo`'s first-class actions. See `docs/PROTOCOL.md` for full selector set.
 
-## 5. Trust tiers
+---
 
-| Tier | When it applies | Key used | Worst case if the server is compromised |
+## 6. Trust tiers
+
+| Tier | When it applies | Key used | Blast radius if server compromised |
 |---|---|---|---|
-| Auto | Payee is `STABLE`, amount ≤ payee cap, budget remains | Standing key: recipients = stable payees, periodic limit, ~90-day expiry | At most one period's budget, paid only to trusted addresses |
-| Finance | Payee is `VERIFIED`, or amount is $500–$2,000 | One-time key: exact recipients, exact total, `period=0`, short `valid_before`, `witness` | Only the batch that was approved |
-| Dual | Over $2,000, or any address change | Two human signatures included in `witness` | Nothing moves without both signatures |
+| **auto** | Payee stable ≥ 7 days, amount ≤ $500 | Standing key | At most its absolute cap, to that single payee only |
+| **finance** | Stable address, $500 < amount ≤ $2,000 | One-time key (12h expiry) | Only that payout |
+| **dual** | Address new/recently changed **or** amount > $2,000 | One-time key + explicit review (12h expiry) | Only that payout |
 
-Admin access keys have no limits by design, so they must never be stored on a server. `burnKeyAuthorizationWitness` is likewise **admin-only**, and key management is **root-only**.
+**Note:** amount alone never produces `dual` (address-vouching is what determines `dual` vs
+`finance`). See `docs/DECISIONS.md` D4.
 
-**Consequence for revocation:** FlowRail cannot revoke on the customer's behalf, because it holds no admin key and no root key. Revocation is therefore **customer-triggered** — one tap in the customer's wallet, signed by the customer's own root. FlowRail's design must make that path obvious and reachable in one step. Short one-time-key expiry is the primary containment mechanism; the tap is the backstop.
+---
 
-## 6. Payee lifecycle (low-friction roster changes)
+## 7. Payee lifecycle
 
 ```
 PENDING → VERIFIED → STABLE      (any address change or human demotion → PENDING / SUSPENDED)
 ```
 
-1. Only `STABLE` addresses (approved **and** unchanged for N days, default 7) are in the standing key.
-2. An address change counts as a demotion: the payee returns to `PENDING`, a second approver is required, and the next payout uses a one-time key.
-3. **One passkey signature per payroll run** covers the one-time keys and the standing-key renewal.
-4. If many payees become `STABLE` in one period, the whole group is flagged for review.
+1. Only `STABLE` addresses (approved and unchanged for N days, default 7) are candidates for
+   a standing key.
+2. An address change counts as demotion; the next payout uses a one-time key and escalates
+   appropriately.
+3. Renewal of standing keys is driven by expiry; customer approval is required.
 
-## 7. Authorization artifact
+---
+
+## 8. Authorization artifact
 
 `witness = keccak256(canonical(artifact))`, stored in the `KeyAuthorization`.
 
-```
+```text
 artifact_version, business_id, policy_id, policy_version,
 payee_id, payee_address, amount, token, invoice_ref,
-batch_id, leg_id, budget{limit, period, consumed_before},
+batch_id, leg_id,
 approvals[{approver, role, signed_at, sig_hash}],
 valid_after, valid_before
 ```
 
-## 8. Components
+> Budgets in the artifact omit `period` (not present on deployed Moderato).
 
-- **Policy engine**: a pure function with no I/O and no clock reads. Returns `AUTO | NEEDS_APPROVAL | BLOCKED` plus a reason code.
-- **Key manager**: requests passkey signatures, stores access keys, and uses `getRemainingLimitWithPeriod` as the source of truth for budgets.
-- **Reconciler**: matches `TransferWithMemo` events to invoices by virtual address and memo, never by guessing from amount or timing.
-- **Executor**: builds sponsored, batched Tempo Transactions. Before signing, it checks that the key's recipients, limit and expiry fully cover the artifact.
-- **Audit log**: append-only chain: artifact → KeyAuthorization → tx hash → on-chain events.
-- **Approval screen**: shows every payout with recipient, amount and reference, never a single opaque total. Surfaces a **customer-triggered revoke** action that walks the customer through signing against their own root — FlowRail cannot do this itself.
+---
 
-## 9. Build phases (each must pass before the next starts)
+## 9. Components
 
-1. **Protocol spike (gate — nothing else starts until this passes).** A standalone TypeScript package plus `SPIKE.md` recording every result, written to:
-   - Confirm T3-era access keys and T5-era witness support actually exist on Moderato. If not, the architecture changes and this spec is revised before any other work.
-   - Customer-held passkey root authorizes a scoped access key. (The witness-based flow may use a throwaway admin key purely to prove the *protocol capability* — that key is never part of the product.)
-   - Prove reverts: transfer **over the limit** fails, transfer **to an unlisted recipient** fails, expired `valid_before` fails.
-   - Prove `getRemainingLimitWithPeriod` across a period rollover, and settle the calendar-month vs rolling-window question with evidence.
-   - Prove a batched, fee-sponsored `transferWithMemo` on Moderato via the payment lane.
-   - Confirm the passkey/account-precompile signing path (signature type `2`).
-   - Demonstrate the `witness` revocation path, including who is actually able to execute it.
-2. **Custody proof**: a passkey root key authorizes a scoped access key. Confirm that **transfers over the limit and to unlisted recipients both revert.**
-3. **Control plane**: policy engine (unit-tested first), then key manager, executor and audit log.
-4. **Approval screen**: full breakdown of every payout, plus the customer-triggered revoke.
-5. **Roster state machine**: payee lifecycle and batched re-authorization.
-6. **Demo**: $2,500 invoice → reconciliation → 40 payouts, 39 automatic and 1 approved (Jane, $1,850) → audit trail.
+| Component | Responsibility |
+|---|---|
+| **Policy engine** | Pure function over values (no I/O, clock passed as parameter). |
+| **Key manager** | Derives key IDs, authorizes keys via `viem/tempo`, and confirms scoping on-chain. |
+| **Reconciler** | Matches `transferWithMemo` to payees by memo. |
+| **Executor** | Builds atomic batches; never assumes success. |
+| **Audit log** | Append-only. Records *why* every decision was made (tier + reason strings). |
+| **Approval screen** | Shows every leg and its reason. Discloses that revocation is customer-only. |
 
-## 10. Before any mainnet move (deferred)
+---
 
-Revocation drill, payee sanctions screening, audit log retention, liability terms for payouts the customer approved, and a legal review of the delegated-credential position. Holding scoped access keys is delegation, not a disclaimer — FlowRail should not market itself as non-custodial on the strength of a technical control alone.
+## 10. Build phases
 
-Also unresolved for mainnet: how a passkey-only root gets funded and pays for its own gas.
+**Phase 1 — Protocol spike (gate).** In `spike/`, with results in `spike/SPIKE.md`:
+
+1. Get a funded throwaway root, confirm chain id, head, pathUSD balance.
+2. **Fix `authorizeKey`** to return the actual key it authorized (see `docs/HANDOFF.md` §4.1).
+3. Authorize one key and read it back via `getKey`. Determine `getKey` layout (Q3).
+4. **Probe fail-open** (Q1). Is a fresh key unrestricted before `setAllowedCalls`? If yes,
+   mandate immediate scoping before treating a key as usable.
+5. **Probe period** (Q2). Does an authorization carrying `period` revert/ignore/downgrade?
+6. `probe:boundaries`: over-cap, wrong recipient, expired key all revert; record tx hashes.
+
+**Phase 2 — Policy layer.** Unit tests for `domain/policy.test.ts` with zero RPC.
+
+**Phase 3 — Use cases.** `src/app/` composed against ports.
+
+**Phase 4 — Product UI.** See `docs/UI.md`. Do not mix with `web/` (landing).
+
+**Phase 5 — Demo.** `$2,500` invoice → reconciliation → 40 payouts (39 auto, 1 finance for Jane
+`$1,850`) → atomic batch → explorer-backed audit trail.
+
+---
 
 ## 11. Open items
 
-- Confirm T3/T5 access keys and TIP-1049 scheduling are live on Moderato (Phase 1 spike settles this).
-- Budget period: calendar month or rolling window (spike settles this with evidence).
-- Design-partner agency and currency assumptions.
-- Passkey funding/on-ramp path for a future mainnet launch. Not blocking for the testnet demo.
+- **Product confirmation.** The five questions in `docs/PRODUCT.md` §8 remain unanswered.
+- **Fail-open default** (Moderato) — unknown until probed.
+- **`getKey` populated layout** — unknown until probed.
+- **Period handling** — must be ruled out with evidence.
+
+---
+
+## 12. Before mainnet
+
+Revocation drill, sanctions considerations, audit log retention, liability, and passkey
+funding/on-ramp. `SECURITY.md` governs the disclosure boundary; never overstate the
+"non-custodial" technical control.
