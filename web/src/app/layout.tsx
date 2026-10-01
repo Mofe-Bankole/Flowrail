@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Space_Mono } from "next/font/google";
+import { Newsreader, Source_Sans_3 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const sourceSans = Source_Sans_3({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const spaceMono = Space_Mono({
-  weight: ["400", "700"],
-  variable: "--font-mono",
+const newsreader = Newsreader({
+  variable: "--font-serif",
   subsets: ["latin"],
 });
 
@@ -25,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${spaceMono.variable} h-full`}
+      className={`${sourceSans.variable} ${newsreader.variable} h-full`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground antialiased">
         <ThemeProvider>{children}</ThemeProvider>

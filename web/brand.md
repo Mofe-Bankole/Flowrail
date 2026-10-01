@@ -83,29 +83,37 @@ Verified against the tokens actually written to `globals.css` (not the generator
 
 **Known limitation:** `border` against `background` is 1.40:1 light / 1.85:1 dark. Borders are **decorative only** in this palette. Never use border color alone to convey state, focus, or validity — pair it with a text change, a ring, or an icon.
 
-## Typography — Space Grotesk + Space Mono
+## Typography — Source Sans 3 + Newsreader
 
-- **Display + body:** Space Grotesk
-- **Mono (addresses, hashes, key selectors):** Space Mono
+- **Body + UI:** Source Sans 3 (variable)
+- **Display + headings:** Newsreader (optical size, variable)
 
-Wired via `next/font/google` in `src/app/layout.tsx`. CSS variables: `--font-sans`, `--font-mono`.
+Wired via `next/font/google` in `src/app/layout.tsx`. CSS variables: `--font-sans`, `--font-serif`.
 
-**Inter + JetBrains Mono was explicitly rejected** by the project owner as reading as machine-generated. Do not reintroduce either font. This applies to new components, docs, and any future re-run of `brand-design`.
+**There is no monospace font in this brand.** The project owner rejected Inter + JetBrains Mono, then Space Grotesk + Space Mono, and settled on this pair. Do not add a mono font, and do not reintroduce either rejected pair. This applies to new components, docs, and any future re-run of `brand-design`.
+
+### Handling what used to be mono
+
+Addresses, hashes, key selectors, and chain IDs are set in **Source Sans 3 with `tabular-nums`**. Never set them in Newsreader — serif strokes make a long address hard to scan.
+
+### Weight rule for the serif
+
+Newsreader has real weights. Still keep display headings at 400 or 500. Do not pair `font-serif` with `font-semibold`. Emphasis in a heading comes from size, not a heavy cut.
 
 ### Type scale (as applied)
 
 | Role | Class | Use |
 |---|---|---|
-| Display | `text-5xl font-semibold tracking-[-0.035em]` | Hero only, one per page |
-| H1 (page) | `text-3xl font-semibold tracking-tight` | Section headings |
-| H2 (subsection) | `text-lg font-semibold tracking-tight` | Card titles |
-| H3 | `text-base font-medium tracking-tight` | Minor headings |
+| Display | `font-serif text-5xl leading-[1.06] tracking-[-0.03em]` | Hero only, one per page |
+| H1 (page) | `font-serif text-3xl tracking-tight sm:text-4xl` | Section headings |
+| H2 | `font-serif text-xl` | Tier names and other display-scale labels |
+| H3 | `text-base font-medium tracking-tight` | Card titles |
 | Body | `text-sm` | Default UI text |
 | Reading | `text-base leading-relaxed` | Section ledes |
 | Small / caption | `text-xs uppercase tracking-[0.16em]` | Eyebrows, status labels |
-| Mono | `font-mono text-xs` | Addresses, selectors, chain IDs |
+| Numerals | `tabular-nums` | Amounts, chain IDs, counts |
 
-Money and counters use Space Grotesk with `tabular-nums`, not the mono. Mono is reserved for values where character-by-character identity matters (an address, a selector, a hash).
+Money and counters use Source Sans 3 with `tabular-nums`.
 
 ## Gradients (not used)
 
@@ -137,7 +145,7 @@ Hype words — revolutionary, game-changing, unleash, supercharge, unlock. Emoji
 - Keep the 4 px spacing grid.
 - Keep light and dark mode genuinely separate — both token sets are first-class, and the site ships a user-facing toggle (`src/components/theme-toggle.tsx`).
 - Use `tabular-nums` on any number that updates in place.
-- Use mono only for addresses, selectors, hashes, and chain IDs.
+- Set addresses, selectors, hashes, and chain IDs in Source Sans 3 with `tabular-nums` — never the serif, never a mono.
 - Test every component in both modes before calling it done.
 
 **Don't:**
@@ -146,7 +154,8 @@ Hype words — revolutionary, game-changing, unleash, supercharge, unlock. Emoji
 - Use `transition: all` — name the property.
 - Rely on border color to convey state (see the contrast limitation above).
 - Swap `next/font` for a `<link>` tag. It inlines and self-hosts at build time; a naive swap reintroduces FOUT and layout shift.
-- Reintroduce Inter or JetBrains Mono.
+- Pair `font-serif` with `font-semibold` or heavier.
+- Reintroduce Inter, JetBrains Mono, or Space Grotesk / Space Mono.
 
 ## How the rest of the toolchain uses this file
 

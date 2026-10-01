@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HeroFanout } from "@/components/hero-fanout";
 
 const PIPELINE = [
   {
@@ -152,7 +153,7 @@ function Section({
         <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {eyebrow}
         </p>
-        <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+        <h2 className="mt-4 max-w-3xl font-serif text-3xl tracking-tight text-balance sm:text-4xl">
           {title}
         </h2>
         {lede ? (
@@ -175,6 +176,9 @@ export default function Home() {
             FlowRail
           </a>
           <nav className="ml-auto hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+            <a href="/app" className="transition-colors hover:text-foreground">
+              Desk
+            </a>
             <a href="#how" className="transition-colors hover:text-foreground">
               How it works
             </a>
@@ -196,46 +200,52 @@ export default function Home() {
 
       <main id="top">
         {/* Hero */}
-        <section className="mx-auto w-full max-w-6xl px-6 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-primary" />
-            Building on Moderato testnet
+        <section className="mx-auto w-full max-w-6xl px-6 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-24">
+          <div className="flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+              <span className="size-1.5 rounded-full bg-primary" />
+              Building on Moderato testnet
+            </div>
+
+            <h1 className="mt-8 max-w-4xl font-serif text-5xl leading-[1.06] tracking-[-0.03em] text-balance sm:text-6xl md:text-7xl">
+              Forty payees. One signature.
+            </h1>
+
+            <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground text-pretty">
+              FlowRail is payout operations for businesses on Tempo. You define
+              the rules once. Every run is checked against them, batched into a
+              single transaction, and settled on a stablecoin rail your finance
+              team can reconcile.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="#how"
+                className="inline-flex min-h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                See how a run works
+              </a>
+              <a
+                href="#security"
+                className="inline-flex min-h-11 items-center rounded-md border border-border bg-card px-6 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                How the keys work
+              </a>
+            </div>
           </div>
 
-          <h1 className="mt-8 max-w-4xl text-5xl font-semibold leading-[1.03] tracking-[-0.035em] text-balance sm:text-6xl md:text-7xl">
-            Forty payees. One signature.
-          </h1>
-
-          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            FlowRail is payout operations for businesses on Tempo. You define the
-            rules once. Every run is checked against them, batched into a single
-            transaction, and settled on a stablecoin rail your finance team can
-            reconcile.
-          </p>
-
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <a
-              href="#how"
-              className="inline-flex min-h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              See how a run works
-            </a>
-            <a
-              href="#security"
-              className="inline-flex min-h-11 items-center rounded-md border border-border bg-card px-6 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              How the keys work
-            </a>
+          <div className="mt-20 md:mt-24">
+            <HeroFanout />
           </div>
 
-          <div className="mt-16 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
+          <div className="mx-auto mt-20 grid max-w-4xl gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
             {[
               { k: "Signatures per run", v: "1" },
               { k: "Payees per run", v: "Unbounded" },
               { k: "Keys FlowRail can widen", v: "0" },
             ].map((stat) => (
-              <div key={stat.k} className="bg-card px-6 py-7">
-                <p className="text-2xl font-semibold tracking-tight tabular-nums">
+              <div key={stat.k} className="bg-card px-6 py-7 text-center">
+                <p className="font-serif text-3xl tracking-tight tabular-nums">
                   {stat.v}
                 </p>
                 <p className="mt-1.5 text-sm text-muted-foreground">{stat.k}</p>
@@ -281,7 +291,7 @@ export default function Home() {
                 key={stage.step}
                 className="grid gap-3 bg-card px-6 py-7 sm:grid-cols-[64px_1fr_1.1fr] sm:gap-8 sm:px-8"
               >
-                <span className="font-mono text-sm text-muted-foreground">
+                <span className="font-serif text-base text-muted-foreground">
                   {stage.step}
                 </span>
                 <h3 className="text-base font-medium tracking-tight">
@@ -301,7 +311,7 @@ export default function Home() {
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
               Security model
             </p>
-            <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+            <h2 className="mt-4 max-w-3xl font-serif text-3xl tracking-tight text-balance sm:text-4xl">
               We never hold the key that can move anything you did not already
               authorize.
             </h2>
@@ -361,14 +371,14 @@ export default function Home() {
                 }
               >
                 <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="text-lg font-semibold tracking-tight">
+                  <h3 className="font-serif text-xl">
                     {tier.name}
                   </h3>
                   <span className="text-xs text-muted-foreground">
                     {tier.needs}
                   </span>
                 </div>
-                <p className="mt-4 font-mono text-xs text-foreground">
+                <p className="mt-4 text-sm font-medium text-foreground">
                   {tier.trigger}
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
@@ -438,11 +448,10 @@ export default function Home() {
 
           <p className="mt-8 text-sm text-muted-foreground">
             Network:{" "}
-            <span className="font-mono text-foreground">Moderato</span>{" "}
-            &middot; chain ID{" "}
-            <span className="font-mono text-foreground">42431</span> &middot;
-            settlement asset{" "}
-            <span className="font-mono text-foreground">pathUSD</span> (testnet)
+            <span className="text-foreground">Moderato</span> &middot; chain
+            ID <span className="text-foreground tabular-nums">42431</span>
+            &middot; settlement asset{" "}
+            <span className="text-foreground">pathUSD</span> (testnet)
           </p>
         </Section>
       </main>
