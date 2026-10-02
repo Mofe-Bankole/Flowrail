@@ -1,23 +1,3 @@
-export type RunStatus =
-  | "reconciled"
-  | "awaiting-approval"
-  | "keys-unscoped"
-  | "ready"
-  | "settled";
-
-export type DeskTier = "auto" | "finance" | "dual";
-
-export type DeskLeg = {
-  id: string;
-  name: string;
-  amount: string;
-  tier: DeskTier;
-  reason: string;
-  address: string;
-  stableDays: number;
-  source: "sample";
-};
-
 export type ProbeRecord = {
   at: string;
   what: string;
@@ -26,46 +6,21 @@ export type ProbeRecord = {
   href: string;
 };
 
-export const sampleRun = {
-  id: "INV-2500",
-  label: "Sample run",
-  invoice: "$2,500.00",
-  token: "pathUSD",
-  status: "awaiting-approval" as RunStatus,
-  note: "Seeded for the demo. Not a Moderato receipt.",
-};
-
-export const sampleLegs: DeskLeg[] = [
-  {
-    id: "jane",
-    name: "Jane Adeyemi",
-    amount: "$1,850.00",
-    tier: "finance",
-    reason: "Amount exceeds the $500 auto cap. Address has been stable 40 days. Size, not trust.",
-    address: "0x4c2e91ab",
-    stableDays: 40,
-    source: "sample",
-  },
-  ...Array.from({ length: 8 }, (_, index) => ({
-    id: `auto-${index + 1}`,
-    name: `Standing payee ${index + 1}`,
-    amount: "$65.00",
-    tier: "auto" as const,
-    reason: "Standing payee, within the auto cap.",
-    address: `0x10${index}a…${index}4c`,
-    stableDays: 21,
-    source: "sample" as const,
-  })),
-];
-
-export const sampleSummary = {
-  auto: 39,
-  finance: 1,
-  dual: 0,
-  shown: sampleLegs.length,
-};
-
 export const probeRecords: ProbeRecord[] = [
+  {
+    at: "2026-10-01",
+    what: "Locked transfer to one address, then paid that address 1 base unit.",
+    why: "The allowed recipient succeeded.",
+    tx: "0x09acb34e21bf26df67d68293cff406032bb67dbc6724f9b25008cc231aadf4f4",
+    href: "https://explore.testnet.tempo.xyz/tx/0x09acb34e21bf26df67d68293cff406032bb67dbc6724f9b25008cc231aadf4f4",
+  },
+  {
+    at: "2026-10-01",
+    what: "The same locked key tried to pay a second address.",
+    why: "The chain rejected it. The lock is the control.",
+    tx: "0x0b156dd779e0c9ffa64c0ef1a019f98018cead856946c0466ed4d7f4d3c29579",
+    href: "https://explore.testnet.tempo.xyz/tx/0x0b156dd779e0c9ffa64c0ef1a019f98018cead856946c0466ed4d7f4d3c29579",
+  },
   {
     at: "2026-10-01",
     what: "Authorized a key with a $1 cap and no recipient list.",
@@ -81,11 +36,3 @@ export const probeRecords: ProbeRecord[] = [
     href: "https://explore.testnet.tempo.xyz/tx/0xa809a8dbf4f0f5df47dabf4c348fa9f98f8cbae53a46ddcf5caab3424b7f4715",
   },
 ];
-
-export const statusCopy: Record<RunStatus, string> = {
-  reconciled: "Matched to the roster. Not approved.",
-  "awaiting-approval": "One payout needs a person.",
-  "keys-unscoped": "Keys exist. Recipients are not locked.",
-  ready: "Every live key has a confirmed recipient lock.",
-  settled: "Batch landed. Audit rows point at receipts.",
-};

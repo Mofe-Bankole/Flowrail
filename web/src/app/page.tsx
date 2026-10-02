@@ -15,12 +15,12 @@ const PIPELINE = [
   {
     step: "03",
     title: "Policy decides each line",
-    body: "Every recipient is checked against standing rules: is this payee known, is it inside the period budget, is the address unchanged. Each line resolves to auto, finance, or dual.",
+    body: "Every recipient is checked against standing rules: is this payee known, is the amount under the cap, is the address unchanged. Each line resolves to auto, finance, or dual.",
   },
   {
     step: "04",
-    title: "You sign once",
-    body: "Approve the run summary and sign a single authorization covering the whole batch. One signature per run, not one per payee.",
+    title: "You sign the exceptions",
+    body: "Standing payees under $500 need no new signature. A large amount or a new address does. The demo is 39 automatic and 1 finance approval, not one signature.",
   },
   {
     step: "05",
@@ -51,7 +51,7 @@ const SECURITY = [
   },
   {
     title: "We hold scopes, not permissions",
-    body: "Any key FlowRail holds is bounded by three things you chose: which recipients, how much, and until when. A standing key pays a fixed set of addresses under a period budget. A one-time key pays one amount to one address and then expires.",
+    body: "Any key FlowRail holds is bounded by three things you chose: which recipient, how much, and until when. The amount is a lifetime cap. Moderato has no weekly window. A key can pay anyone until the recipient lock lands.",
   },
   {
     title: "A compromised server cannot widen its own reach",
@@ -59,7 +59,7 @@ const SECURITY = [
   },
   {
     title: "Expiry is the real containment",
-    body: "One-time keys are short-lived by design, so an unused authorization closes itself. Standing keys carry a stability period before they can act on a changed address.",
+    body: "One-time keys expire in 12 hours. Standing keys expire in 7 days. A changed address does not ride an existing key. It needs a new approval.",
   },
   {
     title: "You revoke, not us",
@@ -70,7 +70,7 @@ const SECURITY = [
 const TIERS = [
   {
     name: "Auto",
-    trigger: "Known payee, stable address, inside period budget",
+    trigger: "Known payee, stable address, at most $500",
     needs: "No signature",
     detail:
       "A standing key you authorized once covers this line. It is the point of the standing key — routine pay does not become routine clicks.",
@@ -78,7 +78,7 @@ const TIERS = [
   },
   {
     name: "Finance",
-    trigger: "New payee, or $500–$2,000",
+    trigger: "Stable address, over $500",
     needs: "One-time signature",
     detail:
       "A single scoped authorization for that exact amount to that exact address, expiring within hours. Signature covers the line, not the run.",
@@ -86,10 +86,10 @@ const TIERS = [
   },
   {
     name: "Dual",
-    trigger: "Above $2,000, or any address change",
-    needs: "Two signatures",
+    trigger: "New or changed address",
+    needs: "Fresh approval",
     detail:
-      "Address changes are the highest-risk event in a payout run, so they never ride on an existing key. Two people, two keys, one run.",
+      "A destination the agency has not vouched for never rides an existing key. Amount alone does not produce this tier.",
     accent: false,
   },
 ];
@@ -105,7 +105,7 @@ const TEMPO = [
   },
   {
     title: "Scoped keys are protocol-level",
-    body: "Recipient allowlists, spending limits, and periodic budgets are enforced by Tempo, not by a contract we wrote and hope is correct.",
+    body: "Recipient locks and lifetime caps are enforced by Tempo, not by a contract we wrote. A weekly budget is not deployed on Moderato, so we do not promise one.",
   },
   {
     title: "Built for passkeys",
@@ -117,7 +117,7 @@ const ROADMAP = [
   {
     status: "Now",
     title: "Protocol spike",
-    body: "Prove scoped keys, periodic limits, and revocation actually hold on Moderato testnet before building any control plane on top of them.",
+    body: "An unlocked key paid an unlisted address. The next proof is that setAllowedCalls makes the wrong recipient revert.",
     active: true,
   },
   {
@@ -208,7 +208,7 @@ export default function Home() {
             </div>
 
             <h1 className="mt-8 max-w-4xl font-serif text-5xl leading-[1.06] tracking-[-0.03em] text-balance sm:text-6xl md:text-7xl">
-              Forty payees. One signature.
+              Forty payees. One exception.
             </h1>
 
             <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground text-pretty">
@@ -240,7 +240,7 @@ export default function Home() {
 
           <div className="mx-auto mt-20 grid max-w-4xl gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
             {[
-              { k: "Signatures per run", v: "1" },
+              { k: "Automatic in the demo", v: "39" },
               { k: "Payees per run", v: "Unbounded" },
               { k: "Keys FlowRail can widen", v: "0" },
             ].map((stat) => (

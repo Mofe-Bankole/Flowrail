@@ -10,6 +10,8 @@
     "probe:chain": "tsx src/cli/index.ts probe:chain",
     "probe:key": "tsx src/cli/index.ts probe:key",
     "probe:spend": "tsx src/cli/index.ts probe:spend",
+    "classify": "tsx src/cli/index.ts classify",
+    "probe:lock": "tsx src/cli/index.ts probe:lock",
     "keys:authorize": "tsx src/cli/index.ts keys:authorize",
     "fleet:authorize": "tsx src/cli/index.ts fleet:authorize",
     "probe:boundaries": "tsx src/cli/index.ts probe:boundaries",

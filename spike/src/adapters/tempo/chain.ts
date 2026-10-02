@@ -159,42 +159,45 @@ export function createTempoChain(privateKey: `0x${string}`): TempoChain {
     },
 
     async setAllowedCalls(input: SetAllowedCallsInput) {
-      const hash = await walletClient.writeContract({
-        address: ACCOUNT_PRECOMPILE as ViemAddress,
-        abi: [
-          {
-            type: 'function',
-            name: 'setAllowedCalls',
-            stateMutability: 'nonpayable',
-            inputs: [
-              { name: 'keyId', type: 'address' },
-              {
-                name: 'scopes',
-                type: 'tuple[]',
-                components: [
-                  { name: 'address', type: 'address' },
-                  {
-                    name: 'rules',
-                    type: 'tuple[]',
-                    components: [
-                      { name: 'selector', type: 'bytes4' },
-                      { name: 'recipients', type: 'address[]' },
-                    ],
-                  },
-                ],
-              },
-            ],
-            outputs: [],
-          },
-        ] as const,
-        functionName: 'setAllowedCalls',
-        args: [
-          input.keyId as ViemAddress,
-          input.scopes.map((s) => ({
-            address: s.address as ViemAddress,
-            rules: [{ selector: s.selector ?? '0x00000000', recipients: [...(s.recipients ?? [])] as ViemAddress[] }],
-          })),
-        ],
+      const { encodeFunctionData, getAddress } = await import('viem')
+      const hash = await walletClient.sendTransaction({
+        to: getAddress(ACCOUNT_PRECOMPILE),
+        data: encodeFunctionData({
+          abi: [
+            {
+              type: 'function',
+              name: 'setAllowedCalls',
+              stateMutability: 'nonpayable',
+              inputs: [
+                { name: 'keyId', type: 'address' },
+                {
+                  name: 'scopes',
+                  type: 'tuple[]',
+                  components: [
+                    { name: 'address', type: 'address' },
+                    {
+                      name: 'rules',
+                      type: 'tuple[]',
+                      components: [
+                        { name: 'selector', type: 'bytes4' },
+                        { name: 'recipients', type: 'address[]' },
+                      ],
+                    },
+                  ],
+                },
+              ],
+              outputs: [],
+            },
+          ],
+          functionName: 'setAllowedCalls',
+          args: [
+            input.keyId as ViemAddress,
+            input.scopes.map((s) => ({
+              address: s.address as ViemAddress,
+              rules: [{ selector: s.selector ?? '0x00000000', recipients: [...(s.recipients ?? [])] as ViemAddress[] }],
+            })),
+          ],
+        }),
       })
       return hash
     },

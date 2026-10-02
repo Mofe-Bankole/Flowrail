@@ -67,6 +67,15 @@ be spent against anything.
 **Answered 2026-10-01. `VERIFIED`.** A key authorized with a pathUSD cap and no
 `setAllowedCalls` spent 1 base unit of pathUSD to an arbitrary address.
 
+**Lock confirmed later the same day. `VERIFIED`.** After `setAllowedCalls` restricted
+`transfer` to one address:
+
+- Key: `0x0c4f3a56bf8b750fa1f6eb3df8db65a47fa17231`
+- Authorization: `0x7b2f72123d4f6b448809fcb5c80cb16887951d3416357ec325e1165c163569de`
+- Lock: `0x0b156dd779e0c9ffa64c0ef1a019f98018cead856946c0466ed4d7f4d3c29579`
+- Allowed spend succeeded: `0x09acb34e21bf26df67d68293cff406032bb67dbc6724f9b25008cc231aadf4f4`
+- Denied spend reverted. The recipient lock is the control. The cap is not.
+
 - Root: `0xd8BB65b3a8e316478c0ae94Cc0cad5C0517729ad`
 - Key: `0xa3e2736c3afd1525207140a5ea0ede40be0f0b87`
 - Authorization tx: `0x9dcff13a6f0bbf65c2988f303fdd1e62cd38fff007dce244f7bdbef73eaa3aed`
