@@ -1,0 +1,458 @@
+{
+  "id": "INV-2500",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "counts": {
+    "auto": 39,
+    "finance": 1,
+    "dual": 0
+  },
+  "unresolved": [
+    {
+      "payeeId": "vendor-041",
+      "amount": "96.00"
+    }
+  ],
+  "totalPathUsd": "9687930000",
+  "legs": [
+    {
+      "payeeId": "ada-okonkwo",
+      "name": "Ada Okonkwo",
+      "role": "Creator",
+      "address": "0xdfcd3a65b20d799194e2ad223e04f8480339eb57",
+      "stableForDays": 21,
+      "amount": "65",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "rafa-mendes",
+      "name": "Rafa Mendes",
+      "role": "Creator",
+      "address": "0x5604a85e7f77e59563f22374b711138a52e352b7",
+      "stableForDays": 34,
+      "amount": "120",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "yuki-tanabe",
+      "name": "Yuki Tanabe",
+      "role": "Creator",
+      "address": "0x56ded2cfb01e29a99f838c96f89eff1f83e62dbd",
+      "stableForDays": 12,
+      "amount": "48.5",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "priya-raman",
+      "name": "Priya Raman",
+      "role": "Creator",
+      "address": "0x0742c8ad50d71a2de38d30e92222ccbfc1f19db6",
+      "stableForDays": 58,
+      "amount": "310",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "tomasz-wrona",
+      "name": "Tomasz Wrona",
+      "role": "Creator",
+      "address": "0xf5df7ab5e44b732cffb7bea0959c237093369fab",
+      "stableForDays": 9,
+      "amount": "75.25",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "amara-nwosu",
+      "name": "Amara Nwosu",
+      "role": "Creator",
+      "address": "0x9c94ef6f34bc2f59499d1aaa981aebd7fd54ca2a",
+      "stableForDays": 44,
+      "amount": "220",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "lena-fischer",
+      "name": "Lena Fischer",
+      "role": "Creator",
+      "address": "0x4d412120702aa4483ba8422a580da00a5fbaf71b",
+      "stableForDays": 27,
+      "amount": "95",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "diego-salas",
+      "name": "Diego Salas",
+      "role": "Creator",
+      "address": "0xaacf094676d7c56837e6ff65e1ab71df3da6289b",
+      "stableForDays": 63,
+      "amount": "180.4",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "mei-lin-chow",
+      "name": "Mei Lin Chow",
+      "role": "Creator",
+      "address": "0x4949e2856f195b3a81c65df02d2be6230a2306eb",
+      "stableForDays": 15,
+      "amount": "52",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "oskar-nowak",
+      "name": "Oskar Nowak",
+      "role": "Creator",
+      "address": "0xd7d1a749bb4d90d32eb0019fefefb1ccb70d6eb1",
+      "stableForDays": 31,
+      "amount": "144.99",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "zara-haddad",
+      "name": "Zara Haddad",
+      "role": "Creator",
+      "address": "0xb7d8e02f7171e601f05c1266774acacbadf67eec",
+      "stableForDays": 8,
+      "amount": "60",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "felix-braun",
+      "name": "Felix Braun",
+      "role": "Creator",
+      "address": "0x1d3c78c7f6d1938f477b6d7d1f4b7662a5923d09",
+      "stableForDays": 52,
+      "amount": "275",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "nia-abara",
+      "name": "Nia Abara",
+      "role": "Creator",
+      "address": "0x5c19a268acf4503e50725a7bb411040a550e08ea",
+      "stableForDays": 19,
+      "amount": "88.75",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "hugo-lefevre",
+      "name": "Hugo Lefevre",
+      "role": "Creator",
+      "address": "0x8bf1971b5fc517c2a809fcff6d3d1243480d9db1",
+      "stableForDays": 40,
+      "amount": "132",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "sana-qureshi",
+      "name": "Sana Qureshi",
+      "role": "Creator",
+      "address": "0xe7ef2a348e00a955455fff136df363b0b76f6df5",
+      "stableForDays": 11,
+      "amount": "41.2",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "bilal-karim",
+      "name": "Bilal Karim",
+      "role": "Creator",
+      "address": "0x6f65b7313eae627edac615dc9aa16b172a71f778",
+      "stableForDays": 29,
+      "amount": "199.99",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "ingrid-dahl",
+      "name": "Ingrid Dahl",
+      "role": "Creator",
+      "address": "0xae0bcf1fbc602e874a5c5794a4f035d882f78870",
+      "stableForDays": 22,
+      "amount": "70.5",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "marco-bianchi",
+      "name": "Marco Bianchi",
+      "role": "Creator",
+      "address": "0xd42e60c4af1427470f01bc6f305f0154e0c36959",
+      "stableForDays": 47,
+      "amount": "245",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "ayo-balogun",
+      "name": "Ayo Balogun",
+      "role": "Creator",
+      "address": "0x6f7b177f035bad827083629f9922b32b77521f3c",
+      "stableForDays": 14,
+      "amount": "58",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "freya-lindqvist",
+      "name": "Freya Lindqvist",
+      "role": "Creator",
+      "address": "0xaa730115085241dcf444e77369a30a6dc8b61eba",
+      "stableForDays": 37,
+      "amount": "163.3",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "karim-zaid",
+      "name": "Karim Zaid",
+      "role": "Creator",
+      "address": "0xb186731000f61a2bf08e32bde0848f0147941bd1",
+      "stableForDays": 25,
+      "amount": "84",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "noor-petran",
+      "name": "Noor Petran",
+      "role": "Creator",
+      "address": "0xc57e385a4f0edeb3621797dd70825a77dd0a158e",
+      "stableForDays": 33,
+      "amount": "121.6",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "emil-rask",
+      "name": "Emil Rask",
+      "role": "Creator",
+      "address": "0xb796903260b310352c14bafd14225ffb1abc153d",
+      "stableForDays": 10,
+      "amount": "39.9",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "northlight-studio",
+      "name": "Northlight Studio",
+      "role": "Vendor",
+      "address": "0x746dc1957fda22c33833515ef776e8c3f259b30b",
+      "stableForDays": 71,
+      "amount": "480",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "copperline-legal",
+      "name": "Copperline Legal",
+      "role": "Vendor",
+      "address": "0x9a8036159354adda3a98e6c43b3c31b3c2cb5b3c",
+      "stableForDays": 64,
+      "amount": "425",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "field-form-print",
+      "name": "Field & Form Print",
+      "role": "Vendor",
+      "address": "0xa7f891f1cb45403a214514592fa275c58be9a47c",
+      "stableForDays": 38,
+      "amount": "318.4",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "signal-house-media",
+      "name": "Signal House Media",
+      "role": "Vendor",
+      "address": "0x72fa7625f9cae572fc0ebd98413a499e1b5a03f0",
+      "stableForDays": 26,
+      "amount": "260",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "ardent-print-co",
+      "name": "Ardent Print Co",
+      "role": "Vendor",
+      "address": "0x4fe5e5494fd9ff6044b20378134e1f18875318b9",
+      "stableForDays": 55,
+      "amount": "199",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "kestrel-hosting",
+      "name": "Kestrel Hosting",
+      "role": "Vendor",
+      "address": "0xe25e5f4ee8f7fc2baeaea15b2ac84d828c384c29",
+      "stableForDays": 30,
+      "amount": "142.75",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "vantage-accounting",
+      "name": "Vantage Accounting",
+      "role": "Vendor",
+      "address": "0x2013518504498762461ad6fccfc521ca9edf11a9",
+      "stableForDays": 82,
+      "amount": "475",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "bright-loom-events",
+      "name": "Bright Loom Events",
+      "role": "Vendor",
+      "address": "0x3037dcb9ef3ef9c4bb10315e18efe33c754e9cdf",
+      "stableForDays": 41,
+      "amount": "225.5",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "sable-freight",
+      "name": "Sable Freight",
+      "role": "Vendor",
+      "address": "0x62755e6062ca925c1ae3ef0baf2e1869f5cd73e8",
+      "stableForDays": 18,
+      "amount": "138.2",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "lumen-translation",
+      "name": "Lumen Translation",
+      "role": "Vendor",
+      "address": "0x84bf9ac8d16b5af126888e963a8d12eecaf7e34a",
+      "stableForDays": 36,
+      "amount": "164",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "ironwood-insurance",
+      "name": "Ironwood Insurance",
+      "role": "Vendor",
+      "address": "0x7582ae03f5e9f47dee87b8a9af757273ad03dc5e",
+      "stableForDays": 67,
+      "amount": "488",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "quill-bramble",
+      "name": "Quill & Bramble",
+      "role": "Vendor",
+      "address": "0x2417489ccfa00b63cb01810aeef638d571b8bceb",
+      "stableForDays": 24,
+      "amount": "153.1",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "rosa-iglesias",
+      "name": "Rosa Iglesias",
+      "role": "Subcontractor",
+      "address": "0x0ece0620b4e7f3dc38a5c78d1fa3cdee84457c2c",
+      "stableForDays": 23,
+      "amount": "340",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "kwame-boateng",
+      "name": "Kwame Boateng",
+      "role": "Subcontractor",
+      "address": "0xd1cca06929d6115427c7dd9a07820b1532d97fa7",
+      "stableForDays": 46,
+      "amount": "395",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "elif-demir",
+      "name": "Elif Demir",
+      "role": "Subcontractor",
+      "address": "0x877371d11ba687d6b590168d3ff7e7941acc3543",
+      "stableForDays": 17,
+      "amount": "288.6",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "jonas-keller",
+      "name": "Jonas Keller",
+      "role": "Subcontractor",
+      "address": "0x32ed3e8538f1c7f9ac3c8d80bd9e2bf4a7749249",
+      "stableForDays": 59,
+      "amount": "455",
+      "tier": "auto",
+      "approved": true,
+      "reason": "standing payee, within auto cap"
+    },
+    {
+      "payeeId": "jane-adeyemi",
+      "name": "Jane Adeyemi",
+      "role": "Partner retainer",
+      "address": "0xd89af5fb94c2e32de54dede1001786b1c97b341f",
+      "stableForDays": 40,
+      "amount": "1850",
+      "tier": "finance",
+      "approved": false,
+      "reason": "amount 1850 exceeds auto cap 500"
+    }
+  ]
+}
