@@ -12,6 +12,7 @@
   --popover: oklch(100% 0 0);
   --popover-foreground: oklch(20.00% 0.015 70);
   --primary: oklch(45.00% 0.140 60);
+  --primary-strong: oklch(38.00% 0.145 57);
   --primary-foreground: oklch(100% 0 0);
   --secondary: oklch(95.50% 0.012 75);
   --secondary-foreground: oklch(20.00% 0.015 70);
@@ -24,6 +25,10 @@
   --border: oklch(87.50% 0.012 75);
   --input: oklch(100% 0 0);
   --ring: oklch(45.00% 0.140 60);
+
+  /* Motion — named steps, ease-out by default */
+  --duration-fast: 140ms;
+  --duration-standard: 220ms;
 }
 
 .dark {
@@ -35,6 +40,7 @@
   --popover: oklch(23.00% 0.016 70);
   --popover-foreground: oklch(96.00% 0.010 70);
   --primary: oklch(74.00% 0.150 65);
+  --primary-strong: oklch(81.00% 0.155 70);
   --primary-foreground: oklch(18.00% 0.030 65);
   --secondary: oklch(27.00% 0.038 70);
   --secondary-foreground: oklch(96.00% 0.010 70);
@@ -57,6 +63,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -72,6 +79,19 @@
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);
+  --radius-control: 10px;
+  --radius-row: 14px;
+  --radius-panel: 16px;
+  --radius-card: 18px;
+  --radius-pill: 999px;
+
+  --spacing-control-sm: 2.5rem;
+  --spacing-touch: 2.75rem;
+  --spacing-control-lg: 3rem;
+
+  --opacity-disabled: 0.45;
+
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
 }
@@ -105,11 +125,47 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+
+  button:not(:disabled),
+  a[href],
+  summary,
+  label[for],
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer utilities {
   .tnum {
     font-variant-numeric: tabular-nums;
+  }
+
+  .dur-fast {
+    transition-duration: var(--duration-fast);
+  }
+
+  .dur-standard {
+    transition-duration: var(--duration-standard);
+  }
+
+  /* The hero grid resolving, one payee at a time. */
+  .animate-cell-in {
+    animation: cell-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+}
+
+@keyframes cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
