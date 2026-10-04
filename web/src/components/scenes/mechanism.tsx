@@ -61,7 +61,13 @@ export function MechanismScene() {
       >
         {/* The instrument stays put; only its contents change. */}
         <div className="order-2 lg:order-1">
-          <div className="lg:sticky lg:top-24">
+          {/*
+            A sticky wrapper one viewport tall, with the instrument flex-centred
+            inside it. Pinning the instrument itself to lg:top-24 left it floating
+            near the top of the screen; this keeps it on the vertical centre line
+            for the whole scroll instead.
+          */}
+          <div className="lg:sticky lg:top-0 lg:flex lg:h-screen lg:items-center">
             <Window
               title="flowrail · classifier"
               meta={
