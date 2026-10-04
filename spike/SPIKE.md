@@ -76,6 +76,18 @@ be spent against anything.
 - Allowed spend succeeded: `0x09acb34e21bf26df67d68293cff406032bb67dbc6724f9b25008cc231aadf4f4`
 - Denied spend reverted. The recipient lock is the control. The cap is not.
 
+**Over-cap. `VERIFIED`.** A key capped at 1 pathUSD rejected a transfer of 1.000001 pathUSD.
+
+- Key: `0xafc15ceff071453af919769494eef095d0cf4c6a`
+- Authorization: `0xd239f832569a211edcb54f7ec4b64092a0ad8ca655e2f715455bddf6f59df8a7`
+- The spend reverted. No success hash exists, because the chain refused it.
+
+**Expiry. `VERIFIED`.** A key with a 70-second expiry rejected a 1-base-unit transfer after that time.
+
+- Key: `0xe3448ab6875d48482226931dd322502162834392`
+- Authorization: `0xd29ced643a7028d52488f35ea9be2743f313a1d9f8c383f96f4d6979f3418179`
+- The spend reverted. Expiry is enforced by the chain, not by the engine.
+
 - Root: `0xd8BB65b3a8e316478c0ae94Cc0cad5C0517729ad`
 - Key: `0xa3e2736c3afd1525207140a5ea0ede40be0f0b87`
 - Authorization tx: `0x9dcff13a6f0bbf65c2988f303fdd1e62cd38fff007dce244f7bdbef73eaa3aed`

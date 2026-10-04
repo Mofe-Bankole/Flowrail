@@ -11,7 +11,7 @@ import { tempoModerato } from 'viem/tempo/chains'
 import { createTempoChain } from '../adapters/tempo/chain.js'
 import { ACCOUNT_PRECOMPILE, PATH_USD, TEMPO_SELECTORS } from '../adapters/tempo/config.js'
 import { agentExists, readAgent, writeAgent } from '../adapters/local/store.js'
-import { classifyRun } from '../app/engine.js'
+import { authorizeFleet, classifyRun, executeBatch } from '../app/engine.js'
 import { fmt } from '../domain/policy.js'
 import type { Address, InvoiceLine, Payee } from '../domain/types.js'
 import type { LedgerPort, RosterPort } from '../ports/index.js'
@@ -34,6 +34,12 @@ async function main(): Promise<void> {
       return classify()
     case 'probe:lock':
       return probeLock()
+    case 'probe:cap':
+      return probeCap()
+    case 'probe:expiry':
+      return probeExpiry()
+    case 'probe:batch':
+      return probeBatch()
     default:
       console.error('usage: agent:new | faucet | probe:chain | probe:key | probe:spend | classify')
       process.exitCode = 1
@@ -219,6 +225,162 @@ async function probeLock(): Promise<void> {
       console.log(`${label} REJECTED ${message}`)
     }
   }
+}
+
+async function spendAs(privateKey: `0x${string}`, rootKey: `0x${string}`, amount: bigint) {
+  const root = privateKeyToAccount(rootKey)
+  const spender = Account.fromSecp256k1(privateKey, { access: root })
+  const sink = privateKeyToAccount(generatePrivateKey()).address
+  const client = createWalletClient({
+    account: spender,
+    chain: tempoModerato,
+    transport: http('https://rpc.moderato.tempo.xyz'),
+  }).extend(tempoActions())
+  return client.writeContract({
+    address: PATH_USD,
+    abi: [{
+      type: 'function',
+      name: 'transfer',
+      stateMutability: 'nonpayable',
+      inputs: [
+        { name: 'to', type: 'address' },
+        { name: 'amount', type: 'uint256' },
+      ],
+      outputs: [{ type: 'bool' }],
+    }] as const,
+    functionName: 'transfer',
+    args: [sink, amount],
+  })
+}
+
+async function probeCap(): Promise<void> {
+  const { agent, chain } = await loadChain()
+  const authorized = await chain.authorizeKey({
+    account: agent.address as Address,
+    chainId: chain.chainId,
+    expiry: Math.floor(Date.now() / 1000) + 3600,
+    limits: [[PATH_USD, 1_000_000n]],
+  })
+  console.log(`keyId ${authorized.keyId}`)
+  console.log(`authTx ${authorized.txHash}`)
+  try {
+    const hash = await spendAs(authorized.privateKey, agent.privateKey as `0x${string}`, 1_000_001n)
+    console.log(`over-cap SUCCEEDED ${hash}`)
+  } catch (err) {
+    console.log(`over-cap REJECTED ${err instanceof Error ? err.message.split('\n')[0] : err}`)
+  }
+}
+
+async function probeExpiry(): Promise<void> {
+  const { agent, chain } = await loadChain()
+  const expiry = Math.floor(Date.now() / 1000) + 70
+  const authorized = await chain.authorizeKey({
+    account: agent.address as Address,
+    chainId: chain.chainId,
+    expiry,
+    limits: [[PATH_USD, 1_000_000n]],
+  })
+  console.log(`keyId ${authorized.keyId}`)
+  console.log(`authTx ${authorized.txHash}`)
+  console.log(`expires ${expiry}`)
+  const waitMs = expiry * 1000 - Date.now() + 5_000
+  await new Promise((resolve) => setTimeout(resolve, waitMs))
+  try {
+    const hash = await spendAs(authorized.privateKey, agent.privateKey as `0x${string}`, 1n)
+    console.log(`expired SUCCEEDED ${hash}`)
+  } catch (err) {
+    console.log(`expired REJECTED ${err instanceof Error ? err.message.split('\n')[0] : err}`)
+  }
+}
+
+async function probeBatch(): Promise<void> {
+  const { agent, chain } = await loadChain()
+  const ada = privateKeyToAccount(generatePrivateKey())
+  const jane = privateKeyToAccount(generatePrivateKey())
+  const payees: Payee[] = [
+    { id: 'ada', name: 'Ada', address: ada.address, addressStableForDays: 21 },
+    { id: 'jane', name: 'Jane', address: jane.address, addressStableForDays: 40 },
+  ]
+  const lines: InvoiceLine[] = [
+    { payeeId: 'ada', amount: '0.01' },
+    { payeeId: 'jane', amount: '0.02' },
+  ]
+  const roster: RosterPort = { all: async () => payees, put: async () => undefined }
+  const entries: unknown[] = []
+  const ledger: LedgerPort = {
+    append: async (entry) => { entries.push(entry) },
+    all: async () => entries as never,
+    toJsonl: () => '',
+  }
+  const { createPublicClient } = await import('viem')
+  const reader = createPublicClient({ chain: tempoModerato, transport: http('https://rpc.moderato.tempo.xyz') })
+  const now = Math.floor(Date.now() / 1000)
+  const classified = await classifyRun('INV-2', lines, roster, ledger, now)
+  const approved = { ...classified, legs: classified.legs.map((leg) => ({ ...leg, approved: true })) }
+  for (const signer of [ada, jane]) {
+    const opted = await createWalletClient({
+      account: signer,
+      chain: tempoModerato,
+      transport: http('https://rpc.moderato.tempo.xyz'),
+    }).writeContract({
+      address: PATH_USD,
+      abi: [{
+        type: 'function',
+        name: 'optInToPolicy',
+        stateMutability: 'nonpayable',
+        inputs: [{ name: 'policyId', type: 'uint64' }],
+        outputs: [],
+      }] as const,
+      functionName: 'optInToPolicy',
+      args: [1n],
+    })
+    await reader.waitForTransactionReceipt({ hash: opted })
+    console.log(`opted ${signer.address} ${opted}`)
+  }
+  const before = await Promise.all(payees.map((payee) => chain.balanceOf(payee.address, PATH_USD)))
+  const original = chain.authorizeKey.bind(chain)
+  chain.authorizeKey = async (input) => {
+    const authorized = await original(input)
+    await reader.waitForTransactionReceipt({ hash: authorized.txHash })
+    return authorized
+  }
+  const keys = await authorizeFleet(approved, chain, ledger, agent.address as Address)
+  for (const key of keys) await reader.waitForTransactionReceipt({ hash: key.scopeTx })
+  const root = privateKeyToAccount(agent.privateKey as `0x${string}`)
+  const hashes: `0x${string}`[] = []
+  for (const leg of approved.legs) {
+    const key = keys.find((item) => item.payeeId === leg.payout.payeeId)
+    if (!key) throw new Error(`missing key for ${leg.payout.payeeId}`)
+    const spender = Account.fromSecp256k1(key.privateKey, { access: root })
+    const client = createWalletClient({
+      account: spender,
+      chain: tempoModerato,
+      transport: http('https://rpc.moderato.tempo.xyz'),
+    }).extend(tempoActions())
+    const hash = await client.writeContract({
+      address: PATH_USD,
+      abi: [{
+        type: 'function',
+        name: 'transfer',
+        stateMutability: 'nonpayable',
+        inputs: [
+          { name: 'to', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+        ],
+        outputs: [{ type: 'bool' }],
+      }] as const,
+      functionName: 'transfer',
+      args: [leg.payout.to, leg.payout.amount],
+    })
+    const receipt = await reader.waitForTransactionReceipt({ hash })
+    hashes.push(hash)
+    console.log(`${leg.payout.payeeId} ${hash} ${receipt.status}`)
+  }
+  const after = await Promise.all(payees.map((payee) => chain.balanceOf(payee.address, PATH_USD)))
+  console.log(`legs ${hashes.length}`)
+  payees.forEach((payee, index) => {
+    console.log(`${payee.id} ${before[index]} -> ${after[index]}`)
+  })
 }
 
 async function classify(): Promise<void> {

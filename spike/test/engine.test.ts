@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { approve, authorizeFleet, classifyRun, readyToAuthorize } from '../src/app/engine.js'
+import { approve, authorizeFleet, classifyRun, executeBatch, readyToAuthorize } from '../src/app/engine.js'
 import type { Address, InvoiceLine, Payee } from '../src/domain/types.js'
 import type { ChainPort, LedgerEntry, LedgerPort, RosterPort } from '../src/ports/index.js'
 
@@ -86,5 +86,37 @@ describe('authorizeFleet', () => {
     expect(keys[0]?.lockedTo).toBe(ada.address)
     expect(scoped).toEqual([ada.address])
     expect(book.entries.map((entry) => entry.kind)).toContain('key.scoped')
+  })
+})
+
+describe('executeBatch', () => {
+  it('refuses a fleet that is missing a lock', async () => {
+    const book = ledger()
+    const run = await classifyRun('INV-1', [{ payeeId: 'ada', amount: '65.00' }], roster([ada]), book, 1_700_000_000)
+    const chain = { batchTransferWithMemo: async () => '0x1' } as unknown as ChainPort
+    await expect(executeBatch(run, [], chain, book, ada.address)).rejects.toThrow(/keys/)
+  })
+
+  it('sends one memo-tagged transfer per locked leg', async () => {
+    const book = ledger()
+    const run = await classifyRun('INV-1', [{ payeeId: 'ada', amount: '65.00' }], roster([ada]), book, 1_700_000_000)
+    const seen: { memo: string; amount: bigint }[] = []
+    const chain = {
+      batchTransferWithMemo: async (inputs: { memo: `0x${string}`; amount: bigint }[]) => {
+        seen.push(...inputs)
+        return '0xbatch'
+      },
+    } as unknown as ChainPort
+    const settled = await executeBatch(run, [{
+      payeeId: 'ada',
+      keyId: ada.address,
+      txHash: '0xabc',
+      scopeTx: '0xdef',
+      lockedTo: ada.address,
+      privateKey: '0x01',
+    }], chain, book, ada.address)
+    expect(settled.txHash).toBe('0xbatch')
+    expect(seen[0]?.amount).toBe(65_000_000n)
+    expect(seen[0]?.memo.startsWith('0x616461')).toBe(true)
   })
 })

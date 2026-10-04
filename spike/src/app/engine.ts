@@ -8,7 +8,7 @@
 
 import { decideTier, reconcile, ttlForTier } from '../domain/policy.js'
 import { POLICY, type Address, type InvoiceLine, type Payout, type Tier } from '../domain/types.js'
-import type { ChainPort, LedgerPort, RosterPort } from '../ports/index.js'
+import type { ChainPort, LedgerPort, RosterPort, TransferInput } from '../ports/index.js'
 
 export type RunLeg = {
   payout: Payout
@@ -31,6 +31,14 @@ export type PreparedKey = {
   txHash: `0x${string}`
   scopeTx: `0x${string}`
   lockedTo: Address
+  /** Spike signing material. Never write this to a committed file. */
+  privateKey: `0x${string}`
+}
+
+export type SettledBatch = {
+  runId: string
+  txHash: `0x${string}`
+  legs: number
 }
 
 const TRANSFER = '0xa9059cbb' as const
@@ -144,9 +152,51 @@ export async function authorizeFleet(
       txHash: authorized.txHash,
       scopeTx,
       lockedTo: leg.payout.to,
+      privateKey: authorized.privateKey,
     })
   }
   return prepared
+}
+
+function memoFor(payeeId: string): `0x${string}` {
+  const bytes = Buffer.from(payeeId).subarray(0, 32)
+  return `0x${bytes.toString('hex').padEnd(64, '0')}`
+}
+
+/**
+ * Send every locked leg in one transaction. Refuses a fleet that is missing a
+ * lock hash, or whose lock does not match the payee. The memo is the payee id.
+ */
+export async function executeBatch(
+  run: ClassifiedRun,
+  keys: readonly PreparedKey[],
+  chain: ChainPort,
+  ledger: LedgerPort,
+  from: Address,
+): Promise<SettledBatch> {
+  if (keys.length !== run.legs.length) {
+    throw new Error(`fleet has ${keys.length} keys for ${run.legs.length} legs`)
+  }
+  const byPayee = new Map(keys.map((key) => [key.payeeId, key]))
+  const transfers: TransferInput[] = run.legs.map((leg) => {
+    const key = byPayee.get(leg.payout.payeeId)
+    if (!key?.scopeTx) throw new Error(`${leg.payout.payeeId} has no confirmed recipient lock`)
+    if (key.lockedTo !== leg.payout.to) throw new Error(`${leg.payout.payeeId} lock does not match the payee`)
+    return {
+      from,
+      to: leg.payout.to,
+      token: leg.payout.token,
+      amount: leg.payout.amount,
+      memo: memoFor(leg.payout.payeeId),
+    }
+  })
+  const txHash = await chain.batchTransferWithMemo(transfers)
+  await ledger.append({
+    at: run.at,
+    kind: 'batch.executed',
+    detail: { runId: run.id, tx: txHash, legs: transfers.length },
+  })
+  return { runId: run.id, txHash, legs: transfers.length }
 }
 
 export { POLICY }
