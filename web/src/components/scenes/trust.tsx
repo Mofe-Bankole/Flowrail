@@ -1,7 +1,7 @@
 "use client";
 
 import { Reveal, StatusDot, useInView } from "./primitives";
-import { exceptionLeg, formatUsd, run, runTotal } from "@/lib/demo";
+import { exceptionLeg, financeCount, formatUsd, legCount, run, runTotal } from "@/lib/demo";
 import { proofs } from "@/lib/evidence";
 
 /**
@@ -17,7 +17,10 @@ export function FanScene() {
   const H = 520;
   const TOP = 26;
   const BOTTOM = H - 26;
-  const step = (BOTTOM - TOP) / (run.legs.length - 1);
+  // A one-payee run has no fan: guard the divide rather than emit NaN geometry.
+  const step =
+    legCount > 1 ? (BOTTOM - TOP) / (legCount - 1) : 0;
+  const yAt = (i: number) => (legCount > 1 ? TOP + i * step : H / 2);
   const srcY = H / 2;
 
   return (
@@ -28,7 +31,12 @@ export function FanScene() {
             The shape of a run
           </p>
           <h2 className="mt-4 font-serif text-4xl leading-[1.04] tracking-[-0.01em] text-balance sm:text-5xl">
-            One deposit. Forty exits. One of them stops.
+            One deposit. {legCount} exits.{" "}
+            {financeCount === 0
+              ? "None of them stop."
+              : financeCount === 1
+                ? "One of them stops."
+                : `${financeCount} of them stop.`}
           </h2>
         </Reveal>
 
@@ -45,8 +53,10 @@ export function FanScene() {
             </span>
             <span className="flex items-center gap-2 text-[11px]">
               <span className="h-px w-6 bg-amber-500" aria-hidden="true" />
-              <span className="tnum">1</span>
-              <span className="text-muted-foreground">waits</span>
+              <span className="tnum">{financeCount}</span>
+              <span className="text-muted-foreground">
+                {financeCount === 1 ? "waits" : "wait"}
+              </span>
             </span>
           </div>
 
@@ -58,7 +68,7 @@ export function FanScene() {
           >
             {/* paths */}
             {run.legs.map((leg, i) => {
-              const y = TOP + i * step;
+              const y = yAt(i);
               const isHeld = leg.tier !== "auto";
               return (
                 <path
@@ -83,7 +93,7 @@ export function FanScene() {
 
             {/* endpoints */}
             {run.legs.map((leg, i) => {
-              const y = TOP + i * step;
+              const y = yAt(i);
               const isHeld = leg.tier !== "auto";
               return (
                 <circle
@@ -140,7 +150,7 @@ export function FanScene() {
             {exceptionLeg
               ? (() => {
                   const i = run.legs.findIndex((l) => l.tier !== "auto");
-                  const y = TOP + i * step;
+                  const y = yAt(i);
                   return (
                     <g style={seen ? { animation: "panel-enter 500ms var(--ease-entrance) 900ms both" } : { opacity: 0 }}>
                       <line

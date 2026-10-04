@@ -2,13 +2,15 @@
 
 import { Window, StatusDot, TierChip, useScrollStep } from "./primitives";
 import {
+  averageAuto,
   autoTotal,
+  financeCount,
+  legCount,
   exceptionLeg,
   formatUsd,
   run,
   runTotal,
   shortAddress,
-  sumAmount,
 } from "@/lib/demo";
 
 const sample = [...run.legs.slice(0, 5), exceptionLeg].filter(Boolean);
@@ -32,7 +34,13 @@ const STEPS = [
   {
     kicker: "04 — Result",
     title: "The run divides itself",
-    body: "Thirty-nine leave on their own key. One is held for a signature.",
+    body: `${run.counts.auto} leave${run.counts.auto === 1 ? "s" : ""} on their own key. ${
+      financeCount === 0
+        ? "Nobody needs to sign anything."
+        : financeCount === 1
+          ? "One is held for a signature."
+          : `${financeCount} are held for signatures.`
+    }`,
   },
 ] as const;
 
@@ -133,9 +141,11 @@ function ArrivalState() {
             <span className="tnum text-[11px]">${formatUsd(Number(leg.amount))}</span>
           </div>
         ))}
-        <p className="pt-1 text-[11px] text-muted-foreground">
-          …and {run.legs.length - 6} more, none of them labelled.
-        </p>
+        {legCount > 6 ? (
+          <p className="pt-1 text-[11px] text-muted-foreground">
+            …and {legCount - 6} more, none of them labelled.
+          </p>
+        ) : null}
       </div>
     </div>
   );
@@ -247,7 +257,7 @@ function ResultState() {
           </div>
           <p className="tnum mt-2 font-serif text-4xl">{run.counts.auto}</p>
           <p className="tnum mt-1 text-[12px] text-muted-foreground">
-            ${autoTotal} · ${formatUsd(sumAmount(run.legs.filter((l) => l.tier === "auto")) / run.counts.auto)} avg
+            ${autoTotal} · ${averageAuto()} avg
           </p>
         </div>
         <div

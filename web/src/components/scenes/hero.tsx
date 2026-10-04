@@ -5,9 +5,13 @@ import {
   autoTotal,
   exceptionLeg,
   formatUsd,
+  headline,
+  heldTotal,
   run,
   runTotal,
   shortAddress,
+  standfirst,
+  sumAmount,
 } from "@/lib/demo";
 
 /**
@@ -18,8 +22,9 @@ import {
  * columns so the composition reads with depth rather than as a stack of cards.
  */
 export function HeroScene() {
-  const held = exceptionLeg ? Number(exceptionLeg.amount) : 0;
-  const released = Number(runTotal) - held;
+  const held = heldTotal();
+  const released = sumAmount(run.legs) - held;
+  const head = headline();
 
   return (
     <section className="relative overflow-x-clip pt-28 pb-20 sm:pt-32 lg:pb-28">
@@ -44,13 +49,12 @@ export function HeroScene() {
             Run {run.id}
           </p>
           <h1 className="mt-5 font-serif text-[clamp(2.75rem,6.5vw,5.25rem)] leading-[0.94] font-normal tracking-[-0.02em] text-balance">
-            Forty payees.
+            {head.legs}
             <br />
-            One signature.
+            {head.decision}
           </h1>
           <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
-            A month of agency payouts, split by one rule. Thirty-nine clear
-            themselves. One waits for a person.
+            {standfirst()}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">

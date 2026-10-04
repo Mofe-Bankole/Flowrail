@@ -165,7 +165,7 @@ export function InspectorScene() {
           <Reveal className="panel-deep overflow-hidden rounded-panel">
             <div className="border-b border-border/70 px-5 py-3.5">
               <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                Access key · auto · leg 0041
+                Access key · one auto leg
               </p>
             </div>
             <dl className="divide-y divide-border/60 px-5 py-2">

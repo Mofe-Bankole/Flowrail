@@ -60,3 +60,44 @@ export function shortAddress(address: string): string {
 export const autoTotal = formatUsd(sumAmount(autoLegs));
 export const exceptionTotal = exceptionLeg ? formatUsd(Number(exceptionLeg.amount)) : "0.00";
 export const runTotal = formatUsd(sumAmount(run.legs));
+
+/**
+ * Everything the page asserts about the run's size is derived here, never
+ * written as a literal. The demo ships 40 payees and one escalation, but a
+ * visitor with 20 payees — or 3 — must get a headline and figures that are
+ * true for *their* run, not ours.
+ */
+export const legCount = run.legs.length;
+export const financeCount = run.counts.finance;
+export const autoCount = run.counts.auto;
+
+export function heldTotal(): number {
+  return exceptionLeg ? Number(exceptionLeg.amount) : 0;
+}
+
+/** Guards the divide in per-line averages when a run has no automatic legs. */
+export function averageAuto(): string {
+  return autoCount > 0 ? formatUsd(sumAmount(autoLegs) / autoCount) : "—";
+}
+
+export function headline(): { legs: string; decision: string } {
+  return {
+    legs: `${legCount} payee${legCount === 1 ? "" : "s"}.`,
+    decision:
+      financeCount === 0
+        ? "No signature."
+        : financeCount === 1
+          ? "One signature."
+          : `${financeCount} signatures.`,
+  };
+}
+
+export function standfirst(): string {
+  const opening = "A month of agency payouts, split by one rule.";
+  if (financeCount === 0) return `${opening} Every line clears itself.`;
+  if (autoCount === 0) {
+    return `${opening} None clear themselves — ${financeCount === 1 ? "one waits" : `${financeCount} wait`} for a person.`;
+  }
+  if (financeCount === 1) return `${opening} All but one clear themselves.`;
+  return `${opening} ${autoCount} clear themselves; ${financeCount} wait for a person.`;
+}
