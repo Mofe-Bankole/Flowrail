@@ -1,24 +1,29 @@
-export type EngineLeg = {
-  name: string;
-  amount: string;
-  tier: "auto" | "finance" | "dual";
-  approved: boolean;
-  reason: string;
-};
+/**
+ * The desk and the landing page read the same run.
+ *
+ * `demo-run.json` is produced by the real policy engine via
+ * `npm --prefix ../spike run demo:export`. Importing it — rather than shelling
+ * out to the spike at request time — means the desk shows exactly what the
+ * landing page shows, and it works on Vercel where a sibling checkout and a
+ * child process do not exist.
+ */
+
+import { run, type DemoLeg, type Tier } from "./demo";
+
+export type EngineLeg = DemoLeg;
 
 export type EngineRun = {
   id: string;
-  counts: { auto: number; finance: number; dual: number };
+  counts: Record<Tier, number>;
   unresolved: number;
   legs: EngineLeg[];
 };
 
 export async function classifyInvoice(): Promise<EngineRun> {
-  const { execFile } = await import("node:child_process");
-  const { promisify } = await import("node:util");
-  const run = promisify(execFile);
-  const { stdout } = await run("npm", ["run", "--silent", "classify"], {
-    cwd: "/home/mofebanks/Documents/Crypto Worlds Fair/flowrail/spike",
-  });
-  return JSON.parse(stdout) as EngineRun;
+  return {
+    id: run.id,
+    counts: run.counts,
+    unresolved: run.unresolved.length,
+    legs: run.legs,
+  };
 }
