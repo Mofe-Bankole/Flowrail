@@ -76,7 +76,7 @@ export function MechanismScene() {
                   step {step + 1}/4
                 </span>
               }
-              className="min-h-[30rem] shadow-[var(--shadow-deep)]"
+              className="w-full min-h-[30rem] shadow-[var(--shadow-deep)]"
             >
               <div className="p-5 sm:p-6" key={step}>
                 {step === 0 ? <ArrivalState /> : null}
