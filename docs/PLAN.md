@@ -71,6 +71,9 @@ Item 13 is the highest-value hour in the whole project. It converts a demo into 
 
 ### Submission checklist
 
+Authoritative requirements, deadlines, and status live in [`REQUIREMENTS.md`](../REQUIREMENTS.md).
+This list is the working subset.
+
 - [ ] Colosseum registration confirmed
 - [ ] Live URL, HTTPS, no auth wall in front of the demo
 - [ ] Demo video uploaded
