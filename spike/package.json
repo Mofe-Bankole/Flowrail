@@ -1,11 +1,14 @@
 {
   "name": "@flowrail/spike",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "description": "FlowRail protocol spike - one customer signature, a fleet of scoped Tempo access keys, provable on-chain.",
   "scripts": {
     "agent:new": "tsx src/cli/index.ts agent:new",
+    "agent:rotate": "tsx src/cli/index.ts agent:rotate",
+    "keys:rotate": "tsx src/cli/index.ts keys:rotate",
     "faucet": "tsx src/cli/index.ts faucet",
     "probe:chain": "tsx src/cli/index.ts probe:chain",
     "probe:key": "tsx src/cli/index.ts probe:key",
@@ -20,7 +23,8 @@
     "fleet:authorize": "tsx src/cli/index.ts fleet:authorize",
     "probe:boundaries": "tsx src/cli/index.ts probe:boundaries",
     "probe:period": "tsx src/cli/index.ts probe:period",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "accounts": "^0.19.0",

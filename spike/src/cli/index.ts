@@ -10,9 +10,9 @@ import { tempoModerato } from 'viem/tempo/chains'
 
 import { createTempoChain } from '../adapters/tempo/chain.js'
 import { ACCOUNT_PRECOMPILE, PATH_USD, TEMPO_SELECTORS } from '../adapters/tempo/config.js'
-import { agentExists, readAgent, writeAgent } from '../adapters/local/store.js'
+import { agentExists, readAgent, recordRetired, writeAgent } from '../adapters/local/store.js'
+import { fmt, parseAmount } from '../domain/policy.js'
 import { authorizeFleet, classifyRun, executeBatch } from '../app/engine.js'
-import { fmt } from '../domain/policy.js'
 import type { Address, InvoiceLine, Payee } from '../domain/types.js'
 import type { LedgerPort, RosterPort } from '../ports/index.js'
 
@@ -22,6 +22,10 @@ async function main(): Promise<void> {
   switch (command) {
     case 'agent:new':
       return agentNew()
+    case 'agent:rotate':
+      return agentRotate()
+    case 'keys:rotate':
+      return keysRotate()
     case 'faucet':
       return faucet()
     case 'probe:chain':
@@ -41,7 +45,15 @@ async function main(): Promise<void> {
     case 'probe:batch':
       return probeBatch()
     default:
-      console.error('usage: agent:new | faucet | probe:chain | probe:key | probe:spend | classify')
+      console.error(
+        [
+          'usage:',
+          '  agent:new                     create the local root keystore',
+          '  agent:rotate                  replace it, creating a NEW account (needs --yes)',
+          '  keys:rotate <oldKeyId> <cap> [ttlHours]   replace a live access key',
+          '  faucet | classify | probe:*',
+        ].join('\n'),
+      )
       process.exitCode = 1
   }
 }
@@ -62,6 +74,137 @@ async function agentNew(): Promise<void> {
     note: 'throwaway Moderato root. not the product key. never commit.',
   })
   console.log(`agent created: ${account.address}`)
+}
+
+/**
+ * Replace the root keystore.
+ *
+ * This is NOT a secret rotation in the usual sense, and the distinction matters
+ * enough to require `--yes`. A Tempo account *is* its public key: generating a
+ * new one does not move any funds, it produces a different account with a zero
+ * balance. Anyone reaching for this command expecting "new secret, same
+ * account" will get a stranded balance instead.
+ *
+ * The real work of changing the root is migrating funds and access keys across,
+ * which is a deliberate sequence a human drives. What this does is make step one
+ * safe and irreversible-by-accident: the old private key is never written
+ * anywhere after this point, and the retired address is recorded so the old
+ * account's on-chain access keys can still be found and revoked.
+ */
+async function agentRotate(): Promise<void> {
+  if (!(await agentExists())) {
+    console.error('no agent to rotate. run agent:new first.')
+    process.exitCode = 1
+    return
+  }
+  if (!process.argv.includes('--yes')) {
+    const current = await readAgent()
+    console.error(`about to replace the root for ${current.address}.`)
+    console.error('')
+    console.error('This creates a NEW account with a NEW address and a ZERO balance.')
+    console.error('It does not move funds. Migrate to the new address before retiring')
+    console.error('the old one, or the old balance is still there and the new one is empty.')
+    console.error('')
+    console.error('Re-run with --yes if that is what you want.')
+    process.exitCode = 1
+    return
+  }
+
+  const previous = await readAgent()
+  const privateKey = generatePrivateKey()
+  const account = privateKeyToAccount(privateKey)
+  const now = Math.floor(Date.now() / 1000)
+
+  await writeAgent({
+    address: account.address,
+    privateKey,
+    createdAt: now,
+    note: 'throwaway Moderato root. not the product key. never commit.',
+  })
+  // The old private key is deliberately not written here. It survives only in
+  // the file we just overwrote - nowhere else - and this address is recorded so
+  // its on-chain access keys remain reachable for revocation.
+  await recordRetired({
+    address: previous.address,
+    createdAt: previous.createdAt,
+    retiredAt: now,
+    why: 'agent:rotate',
+  })
+
+  console.log(`retired ${previous.address}`)
+  console.log(`new root ${account.address}`)
+  console.log(`balance  ${fmt(await chainBalanceFor(privateKey))} pathUSD`)
+  console.log('')
+  console.log('The old private key is gone from this machine. To finish the migration:')
+  console.log(`  1. fund ${account.address} (npm run faucet -- it uses the new root)`)
+  console.log(`  2. revoke every access key still authorized on ${previous.address}`)
+  console.log('  3. record where the new private key is actually kept')
+}
+
+async function chainBalanceFor(privateKey: `0x${string}`): Promise<bigint> {
+  const chain = createTempoChain(privateKey)
+  return chain.balanceOf(privateKeyToAccount(privateKey).address as Address, PATH_USD)
+}
+
+/**
+ * Replace a live access key: mint a fresh one with the same shape, then revoke
+ * the old one on-chain.
+ *
+ * This is the rotation that matters. The root key is the one secret that can move
+ * the whole balance; access keys are the ones that get handed around, leak, and
+ * end up on developer laptops. Revoking the old key only after the replacement is
+ * confirmed is the whole point - the order is mint, verify, then revoke, so
+ * there is no window where neither key works.
+ */
+async function keysRotate(): Promise<void> {
+  const [, , , oldKeyId, capArg, ttlArg] = process.argv
+  if (!oldKeyId || !capArg) {
+    console.error('usage: keys:rotate <oldKeyId> <capPathUsd> [ttlHours]')
+    process.exitCode = 1
+    return
+  }
+  const cap = parseAmount(capArg)
+  const ttlHours = ttlArg ? Number(ttlArg) : 24
+  if (ttlHours <= 0) {
+    console.error('ttlHours must be positive')
+    process.exitCode = 1
+    return
+  }
+
+  const { agent, chain } = await loadChain()
+  const oldInfo = await chain.readKey(oldKeyId as Address, agent.address as Address)
+  if (!oldInfo) {
+    console.error(`no key ${oldKeyId} on ${agent.address}: nothing to rotate`)
+    process.exitCode = 1
+    return
+  }
+
+  console.log(`replacing ${oldKeyId}`)
+  console.log(`  old: still authorized on ${agent.address}`)
+  console.log(`  new: cap ${capArg} pathUSD, ttl ${ttlHours}h`)
+
+  const replacement = await chain.authorizeKey({
+    account: agent.address as Address,
+    chainId: chain.chainId,
+    expiry: Math.floor(Date.now() / 1000) + ttlHours * 3600,
+    limits: [[PATH_USD, cap]],
+  })
+  console.log(`  minted ${replacement.keyId}`)
+  console.log(`  authTx ${replacement.txHash}`)
+
+  const confirmed = await chain.readKey(replacement.keyId as Address, agent.address as Address)
+  if (!confirmed) {
+    console.error('replacement not visible on-chain; NOT revoking the old key')
+    process.exitCode = 1
+    return
+  }
+  console.log('  replacement confirmed on-chain')
+
+  await chain.revokeKey(agent.address as Address, oldKeyId as Address)
+  console.log(`  revoked ${oldKeyId}`)
+  console.log('')
+  console.log(`new key ${replacement.keyId} is in the chain adapter return value only.`)
+  console.log('Hand it to the fleet and persist the secret wherever the fleet is persisted.')
 }
 
 async function loadChain() {
