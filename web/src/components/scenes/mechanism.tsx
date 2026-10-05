@@ -20,16 +20,19 @@ const STEPS = [
     kicker: "01 — Arrival",
     title: "Money lands with no instructions",
     body: "A deposit arrives. No memo tells us who to pay.",
+    fig: "arrival" as const,
   },
   {
     kicker: "02 — Identity",
     title: "Each address is resolved to a person",
     body: "Our roster supplies a name and how long that address has been stable.",
+    fig: "identity" as const,
   },
   {
     kicker: "03 — Rule",
     title: "Two questions, asked per line",
     body: "Is this address old enough, and is the amount small enough? Both must pass.",
+    fig: "rule" as const,
   },
   {
     kicker: "04 — Result",
@@ -41,6 +44,7 @@ const STEPS = [
           ? "One is held for a signature."
           : `${financeCount} are held for signatures.`
     }`,
+    fig: "result" as const,
   },
 ] as const;
 
@@ -110,12 +114,150 @@ export function MechanismScene() {
                 <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
                   {s.body}
                 </p>
+
+{/*
+  A small real-data figure under each step. Without these the narrative column
+  is prose only, which left the tail of the scene — after the instrument has
+  scrolled away — as the emptiest stretch of the page. They are annotation
+  scale, not a second set of panels: no shadows, no floating offsets.
+*/}
+                <StepFigure kind={s.fig} />
               </div>
             </li>
           ))}
         </ol>
       </div>
     </section>
+  );
+}
+
+/** The representative line the figures quote: a median routine payout. */
+const routine = [...run.legs]
+  .filter((l) => l.tier === "auto")
+  .sort((a, b) => Number(a.amount) - Number(b.amount))[
+  Math.floor(run.legs.filter((l) => l.tier === "auto").length / 2)
+];
+
+function StepFigure({ kind }: { kind: (typeof STEPS)[number]["fig"] }) {
+  const wrap =
+    "mt-6 max-w-sm border-l border-border/70 pl-3.5 text-[10px] leading-relaxed";
+
+  if (kind === "arrival") {
+    return (
+      <div className={wrap}>
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="font-mono text-muted-foreground">0x91c4…0a3f</span>
+          <span className="tnum text-[11px]">${runTotal}</span>
+        </div>
+        <p className="mt-1 font-mono text-muted-foreground">
+          memo — none · 1 tx · unlabelled
+        </p>
+      </div>
+    );
+  }
+
+  if (kind === "identity" && routine) {
+    return (
+      <div className={wrap}>
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="truncate text-[11px] text-foreground/85">
+            {routine.name}
+          </span>
+          <span className="tnum shrink-0 font-mono text-muted-foreground">
+            {routine.stableForDays}d stable
+          </span>
+        </div>
+        <p className="mt-1 truncate font-mono text-muted-foreground">
+          {routine.role} · {shortAddress(routine.address)}
+        </p>
+      </div>
+    );
+  }
+
+  if (kind === "rule" && routine && exceptionLeg) {
+    return (
+      <div className={wrap}>
+        <Gauge
+          label="tenure"
+          ratio={routine.stableForDays / 7}
+          read={`${routine.stableForDays}d`}
+          cap="≥ 7d"
+          pass
+        />
+        <Gauge
+          label="routine"
+          ratio={Number(routine.amount) / 500}
+          read={`$${formatUsd(Number(routine.amount))}`}
+          cap="≤ $500"
+        />
+        <Gauge
+          label="held"
+          ratio={Number(exceptionLeg.amount) / 500}
+          read={`$${formatUsd(Number(exceptionLeg.amount))}`}
+          cap="≤ $500"
+          ratioCap={1}
+        />
+      </div>
+    );
+  }
+
+  const total = run.legs.length;
+  const autoPct = (run.counts.auto / total) * 100;
+  return (
+    <div className={wrap}>
+      <div className="flex h-2 overflow-hidden rounded-full bg-surface-sunken">
+        <span className="bg-primary-strong" style={{ width: `${autoPct}%` }} />
+      </div>
+      <div className="mt-1.5 flex items-baseline justify-between gap-3 font-mono text-muted-foreground">
+        <span className="tnum">{run.counts.auto} auto</span>
+        <span className="tnum">
+          {run.counts.finance} held · {run.unresolved.length} unmatched
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function Gauge({
+  label,
+  ratio,
+  read,
+  cap,
+  pass,
+  ratioCap,
+}: {
+  label: string;
+  ratio: number;
+  read: string;
+  cap: string;
+  pass?: boolean;
+  ratioCap?: number;
+}) {
+  const capped = ratioCap ?? 4;
+  const over = ratio > 1;
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-12 shrink-0 font-mono text-muted-foreground">{label}</span>
+      <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-sunken">
+        <span
+          className={`absolute inset-y-0 left-0 ${
+            over ? "bg-amber-500" : pass ? "bg-primary-strong" : "bg-primary/70"
+          }`}
+          style={{ width: `${Math.min(ratio / capped, 1) * 100}%` }}
+        />
+        {/* the threshold itself */}
+        <span
+          className="absolute inset-y-0 w-px bg-foreground/35"
+          style={{ left: `${(1 / capped) * 100}%` }}
+        />
+      </span>
+      <span className="tnum w-16 shrink-0 text-right font-mono text-muted-foreground">
+        {read}
+      </span>
+      <span className="w-10 shrink-0 text-right font-mono text-muted-foreground/70">
+        {cap}
+      </span>
+    </div>
   );
 }
 

@@ -134,13 +134,19 @@ export function Window({
   );
 }
 
-export function StatusDot({ tone }: { tone: "auto" | "finance" | "idle" }) {
+export function StatusDot({
+  tone,
+}: {
+  tone: "auto" | "finance" | "dual" | "idle";
+}) {
   const toneClass =
     tone === "auto"
       ? "bg-emerald-500"
       : tone === "finance"
         ? "bg-amber-500"
-        : "bg-foreground/25";
+        : tone === "dual"
+          ? "bg-amber-600"
+          : "bg-foreground/25";
   return (
     <span className="relative inline-flex size-1.5 shrink-0">
       {tone !== "idle" ? (
