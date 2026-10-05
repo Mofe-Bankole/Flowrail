@@ -40,6 +40,7 @@ export default async function DeskPage() {
       run={{
         id: runResult.value.id,
         legs: runResult.value.legs,
+        policy: runResult.value.policy,
         unresolved: runResult.value.unresolved,
       }}
       chain={

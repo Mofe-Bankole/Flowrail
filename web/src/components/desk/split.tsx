@@ -7,7 +7,7 @@ import { useState } from "react";
  *
  * Not a chart of history — a partition of the run in front of you. The segment
  * widths are the two destinations' share of real value, and the held segment
- * carries the $500 cap as a visible threshold it overshot. Clicking a
+ * carries the auto cap as a visible threshold it overshot. Clicking a
  * destination hands the selection to the ledger below.
  *
  * One line out of forty holds a fifth of the money. That fact is the product,
@@ -23,23 +23,32 @@ export type Destination = {
   share: number;
 };
 
-const cap = 500;
-
 export function Split({
   total,
   totalLegs,
   destinations,
+  autoCap,
   selected,
   onSelect,
 }: {
   total: number;
   totalLegs: number;
   destinations: [Destination, Destination];
+  /** The threshold the held line overshot, in dollars, from the run's policy. */
+  autoCap: number;
   selected: Destination["key"] | null;
   onSelect: (k: Destination["key"] | null) => void;
 }) {
   const [auto, held] = destinations;
   const heldLine = held.legs === 1;
+  /**
+   * The cap marker is placed proportionally inside the held segment. That only
+   * makes sense when the held segment is actually wider than the cap — i.e. the
+   * line really did overshoot it. With no held value, or a held total below the
+   * cap, the marker would sit off the end of its own segment (or divide by
+   * zero), so it is drawn only when it has something real to point at.
+   */
+  const showCap = held.value > 0 && held.value >= autoCap;
 
   return (
     <section aria-labelledby="split-h" className="relative">
@@ -129,14 +138,14 @@ export function Split({
               </span>
 
               {/* The cap, drawn where the held line crosses it. */}
-              {d.key === "held" ? (
+              {d.key === "held" && showCap ? (
                 <span
                   aria-hidden="true"
                   className="absolute inset-y-0 w-px bg-amber-600/70"
-                  style={{ left: `${(cap / d.value) * 100}%` }}
+                  style={{ left: `${(autoCap / d.value) * 100}%` }}
                 >
                   <span className="tnum absolute top-1.5 -left-1 hidden rounded-surface-sunken bg-amber-500/20 px-1 font-mono text-[9px] text-amber-700 sm:block dark:text-amber-300">
-                    ${cap} cap
+                    ${autoCap} cap
                   </span>
                 </span>
               ) : null}

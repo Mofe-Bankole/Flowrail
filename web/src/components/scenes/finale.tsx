@@ -2,6 +2,8 @@
 
 import { Reveal, StatusDot, Window } from "./primitives";
 import {
+  addressStabilityDays,
+  autoCapUsd,
   exceptionLeg,
   formatUsd,
   run,
@@ -36,7 +38,9 @@ export function FinaleScene() {
       k: "Released on their own key",
       v: formatUsd(released),
       n: run.counts.auto,
-      note: "amount ≤ $500 · address tenure ≥ 7d",
+      // Read from the run's policy rather than typed in, so this caption cannot
+      // keep claiming a threshold the engine no longer applies.
+      note: `amount ≤ $${autoCapUsd} · address tenure ≥ ${addressStabilityDays}d`,
       tone: "auto" as const,
     },
     {

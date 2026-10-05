@@ -20,9 +20,6 @@ import { Split, type Destination } from "./split";
  * top third of the screen.
  */
 
-const AUTO_CAP = 500;
-const STABILITY_DAYS = 7;
-
 export function Desk({
   run,
   chain,
@@ -31,6 +28,7 @@ export function Desk({
   run: {
     id: string;
     legs: DemoLeg[];
+    policy: { autoCap: string; addressStabilityDays: number };
     unresolved: { payeeId: string; amount: string }[];
   };
   chain: { pathUsd: string; head: string; address: string; chainId: number } | null;
@@ -40,6 +38,11 @@ export function Desk({
   const [selected, setSelected] = useState<Destination["key"] | null>(null);
   const [openLeg, setOpenLeg] = useState<string | null>(null);
   const [showLevels, setShowLevels] = useState(false);
+
+  // Thresholds come from the run that was classified against them, not from a
+  // constant here. Same 1e6 scale the engine parses amounts with.
+  const autoCap = Number(run.policy.autoCap) / 1e6;
+  const stabilityDays = run.policy.addressStabilityDays;
 
   const auto = run.legs.filter((l) => l.tier === "auto");
   const held = run.legs.filter((l) => l.tier !== "auto");
@@ -81,6 +84,7 @@ export function Desk({
           total={total}
           totalLegs={run.legs.length}
           destinations={destinations}
+          autoCap={autoCap}
           selected={selected}
           onSelect={setSelected}
         />
@@ -127,15 +131,15 @@ export function Desk({
                   <Gate
                     label="amount"
                     value={Number(oneDecision.amount)}
-                    cap={AUTO_CAP}
-                    capLabel={`≤ $${AUTO_CAP}`}
+                    cap={autoCap}
+                    capLabel={`≤ $${autoCap}`}
                     over
                   />
                   <Gate
                     label="tenure"
                     value={oneDecision.stableForDays}
-                    cap={STABILITY_DAYS}
-                    capLabel={`≥ ${STABILITY_DAYS}d`}
+                    cap={stabilityDays}
+                    capLabel={`≥ ${stabilityDays}d`}
                     pass
                   />
                   <p className="mt-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
@@ -148,7 +152,9 @@ export function Desk({
                 <p className="max-w-md text-[12px] leading-relaxed text-muted-foreground">
                   {wallet.address
                     ? "Wallet connected. Signing this line is not wired to a contract yet — settlement is blocked on the transfer policy, not on you."
-                    : "One signature releases this line. The other 39 need nothing from you."}
+                    : `One signature releases this line. The other ${auto.length} need${
+                        auto.length === 1 ? "s" : ""
+                      } nothing from you.`}
                 </p>
                 {wallet.address ? (
                   <button

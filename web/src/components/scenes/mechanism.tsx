@@ -2,7 +2,9 @@
 
 import { Window, StatusDot, TierChip, useScrollStep } from "./primitives";
 import {
+  addressStabilityDays,
   averageAuto,
+  autoCapUsd,
   autoTotal,
   financeCount,
   legCount,
@@ -179,22 +181,22 @@ function StepFigure({ kind }: { kind: (typeof STEPS)[number]["fig"] }) {
       <div className={wrap}>
         <Gauge
           label="tenure"
-          ratio={routine.stableForDays / 7}
+          ratio={routine.stableForDays / addressStabilityDays}
           read={`${routine.stableForDays}d`}
-          cap="≥ 7d"
+          cap={`≥ ${addressStabilityDays}d`}
           pass
         />
         <Gauge
           label="routine"
-          ratio={Number(routine.amount) / 500}
+          ratio={Number(routine.amount) / autoCapUsd}
           read={`$${formatUsd(Number(routine.amount))}`}
-          cap="≤ $500"
+          cap={`≤ $${autoCapUsd}`}
         />
         <Gauge
           label="held"
-          ratio={Number(exceptionLeg.amount) / 500}
+          ratio={Number(exceptionLeg.amount) / autoCapUsd}
           read={`$${formatUsd(Number(exceptionLeg.amount))}`}
-          cap="≤ $500"
+          cap={`≤ $${autoCapUsd}`}
           ratioCap={1}
         />
       </div>
