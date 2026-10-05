@@ -15,7 +15,8 @@ export type EngineLeg = DemoLeg;
 export type EngineRun = {
   id: string;
   counts: Record<Tier, number>;
-  unresolved: number;
+  /** The unmatched lines themselves, not a count: the desk has to name them. */
+  unresolved: { payeeId: string; amount: string }[];
   legs: EngineLeg[];
 };
 
@@ -23,7 +24,7 @@ export async function classifyInvoice(): Promise<EngineRun> {
   return {
     id: run.id,
     counts: run.counts,
-    unresolved: run.unresolved.length,
+    unresolved: run.unresolved,
     legs: run.legs,
   };
 }
