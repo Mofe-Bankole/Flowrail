@@ -1,6 +1,13 @@
 {
   "id": "INV-2500",
   "generatedAt": "2026-01-01T00:00:00.000Z",
+  "policy": {
+    "addressStabilityDays": 7,
+    "autoCap": "500000000",
+    "dualCap": "2000000000",
+    "standingKeyTtlSeconds": 604800,
+    "oneTimeKeyTtlSeconds": 43200
+  },
   "counts": {
     "auto": 39,
     "finance": 1,
@@ -15,6 +22,7 @@
   "totalPathUsd": "9687930000",
   "legs": [
     {
+      "legId": "ada-okonkwo",
       "payeeId": "ada-okonkwo",
       "name": "Ada Okonkwo",
       "role": "Creator",
@@ -23,9 +31,11 @@
       "amount": "65",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "rafa-mendes",
       "payeeId": "rafa-mendes",
       "name": "Rafa Mendes",
       "role": "Creator",
@@ -34,9 +44,11 @@
       "amount": "120",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "yuki-tanabe",
       "payeeId": "yuki-tanabe",
       "name": "Yuki Tanabe",
       "role": "Creator",
@@ -45,9 +57,11 @@
       "amount": "48.5",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "priya-raman",
       "payeeId": "priya-raman",
       "name": "Priya Raman",
       "role": "Creator",
@@ -56,9 +70,11 @@
       "amount": "310",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "tomasz-wrona",
       "payeeId": "tomasz-wrona",
       "name": "Tomasz Wrona",
       "role": "Creator",
@@ -67,9 +83,11 @@
       "amount": "75.25",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "amara-nwosu",
       "payeeId": "amara-nwosu",
       "name": "Amara Nwosu",
       "role": "Creator",
@@ -78,9 +96,11 @@
       "amount": "220",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "lena-fischer",
       "payeeId": "lena-fischer",
       "name": "Lena Fischer",
       "role": "Creator",
@@ -89,9 +109,11 @@
       "amount": "95",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "diego-salas",
       "payeeId": "diego-salas",
       "name": "Diego Salas",
       "role": "Creator",
@@ -100,9 +122,11 @@
       "amount": "180.4",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "mei-lin-chow",
       "payeeId": "mei-lin-chow",
       "name": "Mei Lin Chow",
       "role": "Creator",
@@ -111,9 +135,11 @@
       "amount": "52",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "oskar-nowak",
       "payeeId": "oskar-nowak",
       "name": "Oskar Nowak",
       "role": "Creator",
@@ -122,9 +148,11 @@
       "amount": "144.99",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "zara-haddad",
       "payeeId": "zara-haddad",
       "name": "Zara Haddad",
       "role": "Creator",
@@ -133,9 +161,11 @@
       "amount": "60",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "felix-braun",
       "payeeId": "felix-braun",
       "name": "Felix Braun",
       "role": "Creator",
@@ -144,9 +174,11 @@
       "amount": "275",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "nia-abara",
       "payeeId": "nia-abara",
       "name": "Nia Abara",
       "role": "Creator",
@@ -155,9 +187,11 @@
       "amount": "88.75",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "hugo-lefevre",
       "payeeId": "hugo-lefevre",
       "name": "Hugo Lefevre",
       "role": "Creator",
@@ -166,9 +200,11 @@
       "amount": "132",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "sana-qureshi",
       "payeeId": "sana-qureshi",
       "name": "Sana Qureshi",
       "role": "Creator",
@@ -177,9 +213,11 @@
       "amount": "41.2",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "bilal-karim",
       "payeeId": "bilal-karim",
       "name": "Bilal Karim",
       "role": "Creator",
@@ -188,9 +226,11 @@
       "amount": "199.99",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "ingrid-dahl",
       "payeeId": "ingrid-dahl",
       "name": "Ingrid Dahl",
       "role": "Creator",
@@ -199,9 +239,11 @@
       "amount": "70.5",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "marco-bianchi",
       "payeeId": "marco-bianchi",
       "name": "Marco Bianchi",
       "role": "Creator",
@@ -210,9 +252,11 @@
       "amount": "245",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "ayo-balogun",
       "payeeId": "ayo-balogun",
       "name": "Ayo Balogun",
       "role": "Creator",
@@ -221,9 +265,11 @@
       "amount": "58",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "freya-lindqvist",
       "payeeId": "freya-lindqvist",
       "name": "Freya Lindqvist",
       "role": "Creator",
@@ -232,9 +278,11 @@
       "amount": "163.3",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "karim-zaid",
       "payeeId": "karim-zaid",
       "name": "Karim Zaid",
       "role": "Creator",
@@ -243,9 +291,11 @@
       "amount": "84",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "noor-petran",
       "payeeId": "noor-petran",
       "name": "Noor Petran",
       "role": "Creator",
@@ -254,9 +304,11 @@
       "amount": "121.6",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "emil-rask",
       "payeeId": "emil-rask",
       "name": "Emil Rask",
       "role": "Creator",
@@ -265,9 +317,11 @@
       "amount": "39.9",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "northlight-studio",
       "payeeId": "northlight-studio",
       "name": "Northlight Studio",
       "role": "Vendor",
@@ -276,9 +330,11 @@
       "amount": "480",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "copperline-legal",
       "payeeId": "copperline-legal",
       "name": "Copperline Legal",
       "role": "Vendor",
@@ -287,9 +343,11 @@
       "amount": "425",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "field-form-print",
       "payeeId": "field-form-print",
       "name": "Field & Form Print",
       "role": "Vendor",
@@ -298,9 +356,11 @@
       "amount": "318.4",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "signal-house-media",
       "payeeId": "signal-house-media",
       "name": "Signal House Media",
       "role": "Vendor",
@@ -309,9 +369,11 @@
       "amount": "260",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "ardent-print-co",
       "payeeId": "ardent-print-co",
       "name": "Ardent Print Co",
       "role": "Vendor",
@@ -320,9 +382,11 @@
       "amount": "199",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "kestrel-hosting",
       "payeeId": "kestrel-hosting",
       "name": "Kestrel Hosting",
       "role": "Vendor",
@@ -331,9 +395,11 @@
       "amount": "142.75",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "vantage-accounting",
       "payeeId": "vantage-accounting",
       "name": "Vantage Accounting",
       "role": "Vendor",
@@ -342,9 +408,11 @@
       "amount": "475",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "bright-loom-events",
       "payeeId": "bright-loom-events",
       "name": "Bright Loom Events",
       "role": "Vendor",
@@ -353,9 +421,11 @@
       "amount": "225.5",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "sable-freight",
       "payeeId": "sable-freight",
       "name": "Sable Freight",
       "role": "Vendor",
@@ -364,9 +434,11 @@
       "amount": "138.2",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "lumen-translation",
       "payeeId": "lumen-translation",
       "name": "Lumen Translation",
       "role": "Vendor",
@@ -375,9 +447,11 @@
       "amount": "164",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "ironwood-insurance",
       "payeeId": "ironwood-insurance",
       "name": "Ironwood Insurance",
       "role": "Vendor",
@@ -386,9 +460,11 @@
       "amount": "488",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "quill-bramble",
       "payeeId": "quill-bramble",
       "name": "Quill & Bramble",
       "role": "Vendor",
@@ -397,9 +473,11 @@
       "amount": "153.1",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "rosa-iglesias",
       "payeeId": "rosa-iglesias",
       "name": "Rosa Iglesias",
       "role": "Subcontractor",
@@ -408,9 +486,11 @@
       "amount": "340",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "kwame-boateng",
       "payeeId": "kwame-boateng",
       "name": "Kwame Boateng",
       "role": "Subcontractor",
@@ -419,9 +499,11 @@
       "amount": "395",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "elif-demir",
       "payeeId": "elif-demir",
       "name": "Elif Demir",
       "role": "Subcontractor",
@@ -430,9 +512,11 @@
       "amount": "288.6",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "jonas-keller",
       "payeeId": "jonas-keller",
       "name": "Jonas Keller",
       "role": "Subcontractor",
@@ -441,9 +525,11 @@
       "amount": "455",
       "tier": "auto",
       "approved": true,
+      "findings": [],
       "reason": "standing payee, within auto cap"
     },
     {
+      "legId": "jane-adeyemi",
       "payeeId": "jane-adeyemi",
       "name": "Jane Adeyemi",
       "role": "Partner retainer",
@@ -452,6 +538,9 @@
       "amount": "1850",
       "tier": "finance",
       "approved": false,
+      "findings": [
+        "amount_over_auto_cap"
+      ],
       "reason": "amount 1850 exceeds auto cap 500"
     }
   ]
