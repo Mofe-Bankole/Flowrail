@@ -77,10 +77,26 @@ export const POLICY = {
   oneTimeKeyTtlSeconds: 12 * 60 * 60,
 } as const
 
+/**
+ * What a decision found, as a code. Program logic branches on these.
+ *
+ * The `reasons` strings beside them are for humans and are not a stable
+ * interface: rewording a message used to silently change which escalation was
+ * recorded, because the classification matched on substrings of the prose.
+ * Codes cannot drift that way.
+ */
+export type FindingCode =
+  | 'unstable_address'
+  | 'amount_over_auto_cap'
+  | 'amount_over_dual_cap'
+
 /** A decision, plus why. The `why` is what the audit trail is made of. */
 export type TierDecision = {
   tier: Tier
-  reasons: string[]
+  /** Machine-readable. The only field to branch on. */
+  findings: readonly FindingCode[]
+  /** Display strings. Never parse these. */
+  reasons: readonly string[]
 }
 
 /** One access key in the fleet. Mirrors what the chain stores, plus our bookkeeping. */

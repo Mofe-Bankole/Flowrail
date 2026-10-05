@@ -7,13 +7,21 @@
  */
 
 import { decideTier, reconcile, ttlForTier } from '../domain/policy.js'
-import { POLICY, type Address, type InvoiceLine, type Payout, type Tier } from '../domain/types.js'
+import { POLICY, type Address, type FindingCode, type InvoiceLine, type Payout, type Tier } from '../domain/types.js'
 import type { ChainPort, LedgerPort, RosterPort, TransferInput } from '../ports/index.js'
 
 export type RunLeg = {
+  /**
+   * Unique within a run. One payee can appear on several invoice lines, so the
+   * payee id is not enough to identify what a human is approving.
+   */
+  legId: string
   payout: Payout
   tier: Tier
-  reasons: string[]
+  /** Codes, not prose. See `FindingCode`. */
+  findings: readonly FindingCode[]
+  /** Display strings. Never parse these. */
+  reasons: readonly string[]
   approved: boolean
 }
 
@@ -54,14 +62,34 @@ export async function classifyRun(
   const { payouts, unresolved } = reconcile(lines, payees, now)
   const byId = new Map(payees.map((payee) => [payee.id, payee]))
 
+  // One payee can carry several invoice lines. Number them so each line gets its
+  // own identity, its own tier, and its own approval.
+  const occurrences = new Map<string, number>()
   const legs = payouts.map((payout) => {
+    const occurrence = occurrences.get(payout.payeeId) ?? 0
+    occurrences.set(payout.payeeId, occurrence + 1)
     const payee = byId.get(payout.payeeId)
+
+    // `reconcile` only emits payouts for payees it resolved, so `payee` is
+    // always present. The branch exists so that stays a type-checked fact: if
+    // that ever stops holding, escalate rather than throw, and record no
+    // finding code, because there is no payee left to have found anything about.
     const decision = payee
       ? decideTier(payee, payout.amount, now)
-      : { tier: 'dual' as const, reasons: ['payee missing from roster'] }
+      : {
+          tier: 'dual' as const,
+          findings: [] as readonly FindingCode[],
+          reasons: ['payee missing from roster'],
+        }
+
     return {
+      legId:
+        occurrence === 0
+          ? payout.payeeId
+          : `${payout.payeeId}#${occurrence + 1}`,
       payout,
       tier: decision.tier,
+      findings: decision.findings,
       reasons: decision.reasons,
       approved: decision.tier === 'auto',
     }
@@ -87,12 +115,25 @@ export async function classifyRun(
   return run
 }
 
-export function approve(run: ClassifiedRun, payeeId: string): ClassifiedRun {
+/**
+ * Approve exactly one leg, keyed by `legId`.
+ *
+ * This deliberately does not take a `payeeId`. A payee can appear on several
+ * invoice lines, and matching on the payee approved every one of them at once -
+ * so a human clearing a routine $65 vendor line also cleared the `dual` line
+ * sitting next to it on the same invoice. One signature, one leg.
+ *
+ * Throws on an unknown id rather than returning the run unchanged: a caller who
+ * approved something that is not there has a bug, and silently doing nothing
+ * would look identical to a successful approval.
+ */
+export function approve(run: ClassifiedRun, legId: string): ClassifiedRun {
+  if (!run.legs.some((leg) => leg.legId === legId)) {
+    throw new Error(`no leg "${legId}" in run ${run.id}`)
+  }
   return {
     ...run,
-    legs: run.legs.map((leg) =>
-      leg.payout.payeeId === payeeId ? { ...leg, approved: true } : leg,
-    ),
+    legs: run.legs.map((leg) => (leg.legId === legId ? { ...leg, approved: true } : leg)),
   }
 }
 

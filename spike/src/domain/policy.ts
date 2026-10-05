@@ -5,7 +5,7 @@
  * behaviour is testable and so the caller can prove what time it used.
  */
 
-import { POLICY, type AccessKeyRecord, type InvoiceLine, type Payee, type Payout, type TierDecision } from './types.js'
+import { POLICY, type AccessKeyRecord, type FindingCode, type InvoiceLine, type Payee, type Payout, type TierDecision } from './types.js'
 
 /**
  * Decide which tier a payout falls into.
@@ -15,31 +15,34 @@ import { POLICY, type AccessKeyRecord, type InvoiceLine, type Payee, type Payout
  * chain's job and it will revert if we get it wrong.
  */
 export function decideTier(payee: Payee, amount: bigint, _now: number): TierDecision {
+  const findings: FindingCode[] = []
   const reasons: string[] = []
 
   if (payee.addressStableForDays < POLICY.addressStabilityDays) {
+    findings.push('unstable_address')
     reasons.push(
       `address only stable ${payee.addressStableForDays}d (< ${POLICY.addressStabilityDays}d)`,
     )
   }
 
   if (amount > POLICY.dualCap) {
+    findings.push('amount_over_dual_cap')
     reasons.push(`amount ${fmt(amount)} exceeds dual cap ${fmt(POLICY.dualCap)}`)
   } else if (amount > POLICY.autoCap) {
+    findings.push('amount_over_auto_cap')
     reasons.push(`amount ${fmt(amount)} exceeds auto cap ${fmt(POLICY.autoCap)}`)
   }
 
   // "dual" is reserved for the irreversible case: a destination we have not
   // vouched for. Amount alone escalates to finance, never to dual - a large
   // payment to a long-known address is a size problem, not a trust problem.
-  const unvetted = payee.addressStableForDays < POLICY.addressStabilityDays
-  if (unvetted) {
-    return { tier: 'dual', reasons }
+  if (findings.includes('unstable_address')) {
+    return { tier: 'dual', findings, reasons }
   }
-  if (reasons.length > 0) {
-    return { tier: 'finance', reasons }
+  if (findings.length > 0) {
+    return { tier: 'finance', findings, reasons }
   }
-  return { tier: 'auto', reasons: ['standing payee, within auto cap'] }
+  return { tier: 'auto', findings, reasons: ['standing payee, within auto cap'] }
 }
 
 /** Key lifetime for a tier. A one-time key lives for hours; a standing key for a week. */
@@ -49,8 +52,11 @@ export function ttlForTier(tier: TierDecision['tier']): number {
 
 /**
  * Turn invoice lines into payouts, attaching the escalation reason.
- * Unknown payees are not silently dropped - they become dual, because paying
- * an id we cannot resolve is exactly the case a human must see.
+ *
+ * Unknown payees are not silently dropped and not guessed at: they are returned
+ * separately as `unresolved`, which produces no leg at all and blocks the whole
+ * run. A line naming a payee we cannot resolve is exactly the case a human must
+ * see before any key is minted.
  */
 export function reconcile(
   lines: readonly InvoiceLine[],
@@ -83,9 +89,10 @@ export function reconcile(
   return { payouts, unresolved }
 }
 
+/** Reads the decision's codes. Precedence is trust first, then size. */
 function escalationReason(d: TierDecision): NonNullable<Payout['escalation']>['reason'] {
-  if (d.reasons.some((r) => r.includes('address only stable'))) return 'new_payee'
-  if (d.reasons.some((r) => r.includes('dual cap'))) return 'amount_over_dual_cap'
+  if (d.findings.includes('unstable_address')) return 'new_payee'
+  if (d.findings.includes('amount_over_dual_cap')) return 'amount_over_dual_cap'
   return 'amount_over_auto_cap'
 }
 
@@ -104,7 +111,13 @@ export function parseAmount(human: string): bigint {
   return BigInt(whole) * 10n ** 6n + BigInt(frac.padEnd(6, '0'))
 }
 
-/** 65000000n -> "65.00". Display only; never feed this back into parseAmount. */
+/**
+ * 65000000n -> "65", 1850000000n -> "1850", 1n -> "0.000001".
+ *
+ * Trailing zeros are dropped so whole-dollar amounts read as whole dollars.
+ * Display only, even though the output does happen to round-trip through
+ * `parseAmount` - do not rely on that, it is not the contract.
+ */
 export function fmt(base: bigint): string {
   const neg = base < 0n
   const v = neg ? -base : base
