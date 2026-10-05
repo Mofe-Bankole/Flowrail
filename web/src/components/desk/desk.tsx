@@ -325,7 +325,7 @@ export function Desk({
                     </span>
                   </div>
                   <p className="mt-3 text-[12px] leading-snug font-medium">{r.what}</p>
-                  <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+                  <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
                     {r.why}
                   </p>
                   <a

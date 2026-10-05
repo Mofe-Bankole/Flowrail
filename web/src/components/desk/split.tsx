@@ -48,10 +48,10 @@ export function Split({
           <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
             Run {heldLine ? "divided" : "divides"} by the rule
           </p>
-          <p className="tnum mt-2 font-serif text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.9] tracking-[-0.03em]">
+          <p className="tnum mt-6 font-serif text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.9] tracking-[-0.03em]">
             ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
-          <p className="mt-2 text-[13px] text-muted-foreground">
+          <p className="mt-3 text-[13px] text-muted-foreground">
             <span className="tnum">{totalLegs}</span> lines ·{" "}
             <span className="tnum">{auto.share.toFixed(1)}%</span> went without you
           </p>
