@@ -1,0 +1,10 @@
+{
+  "name": "flowrail",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "description": "Scripts-only root for the two-package repo. Deliberately not npm workspaces: spike pins zod 3 and web pins zod 4, and workspace hoisting would let one major win the other.",
+  "scripts": {
+    "check": "npm --prefix spike test && npm --prefix spike run typecheck && npm --prefix web run typecheck && npm --prefix web run lint && npm --prefix web run build"
+  }
+}

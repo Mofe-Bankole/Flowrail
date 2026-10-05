@@ -74,7 +74,7 @@ Auto keys live 7 days. Escalated keys live 12 hours.
 Requires Node 22+.
 
 ```bash
-# 1. Install the protocol spike (there is no root package.json - two packages)
+# 1. Install both packages (the root package.json is scripts-only)
 npm --prefix spike install
 npm --prefix web install
 
@@ -95,6 +95,14 @@ npm --prefix web run dev
 `spike/.data/` is gitignored and holds key material. **Never commit it.**
 
 ### Tests
+
+```bash
+npm run check
+```
+
+`check` is the pre-push guard. Vercel auto-deploys every push to `main`, so this is the
+only thing standing between a broken commit and a broken live site. It fails fast and
+runs the full green suite:
 
 ```bash
 npm --prefix spike test         # 32 tests, no RPC required
