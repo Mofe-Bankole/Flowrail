@@ -70,7 +70,7 @@ export function FinaleScene() {
 
       <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
         <Reveal className="max-w-2xl">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+          <p className="text-[12px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
             End of run
           </p>
           <h2 className="mt-4 font-serif text-[clamp(2.25rem,5vw,4rem)] leading-[0.98] tracking-[-0.02em] text-balance">
@@ -90,7 +90,7 @@ export function FinaleScene() {
                   } ${i === 1 ? "surface-sunken lg:-translate-x-3" : ""}`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                    <span className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
                       <StatusDot tone={row.tone} />
                       {row.n} {row.n === 1 ? "line" : "lines"}
                     </span>
@@ -109,7 +109,7 @@ export function FinaleScene() {
                   <p className="text-[12px] leading-snug text-foreground/80">
                     {row.k}
                   </p>
-                  <p className="truncate font-mono text-[10px] text-muted-foreground">
+                  <p className="truncate font-mono text-[11px] text-muted-foreground">
                     {row.note}
                   </p>
                 </div>
@@ -119,12 +119,12 @@ export function FinaleScene() {
             {/* Reconciliation footer. */}
             <div className="panel-float mt-4 rounded-panel px-5 py-3.5 shadow-[var(--shadow-float)]">
               <div className="flex items-baseline justify-between gap-3">
-                <span className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase">
+                <span className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
                   Reconciled
                 </span>
                 <span className="tnum font-serif text-xl">${runTotal}</span>
               </div>
-              <p className="mt-1.5 font-mono text-[10px] leading-relaxed text-muted-foreground">
+              <p className="mt-1.5 font-mono text-[11px] leading-relaxed text-muted-foreground">
                 settled sequentially · one receipt each
               </p>
             </div>
@@ -135,7 +135,7 @@ export function FinaleScene() {
             <Window
               title={`run ${run.id} · closed`}
               meta={
-                <span className="tnum font-mono text-[10px] text-muted-foreground">
+                <span className="tnum font-mono text-[11px] text-muted-foreground">
                   {run.legs.length} legs ·{" "}
                   {new Date(run.generatedAt)
                     .toISOString()
@@ -159,15 +159,15 @@ export function FinaleScene() {
                       >
                         <StatusDot tone={leg.tier} />
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[11px] leading-tight font-medium">
+                          <span className="block truncate text-[12px] leading-tight font-medium">
                             {leg.name}
                           </span>
-                          <span className="block truncate font-mono text-[9px] leading-tight text-muted-foreground">
+                          <span className="block truncate font-mono text-[10px] leading-tight text-muted-foreground">
                             {leg.role} · {leg.stableForDays}d
                           </span>
                         </span>
                         <span
-                          className={`tnum shrink-0 text-[11px] ${
+                          className={`tnum shrink-0 text-[12px] ${
                             leg.tier === "finance"
                               ? "text-amber-600 dark:text-amber-400"
                               : "text-muted-foreground"
@@ -186,10 +186,10 @@ export function FinaleScene() {
                 {run.unresolved.map((u) => (
                   <div key={u.payeeId} className="flex items-center gap-2.5">
                     <StatusDot tone="idle" />
-                    <span className="min-w-0 flex-1 truncate text-[11px] text-muted-foreground">
+                    <span className="min-w-0 flex-1 truncate text-[12px] text-muted-foreground">
                       {u.payeeId} · not on roster
                     </span>
-                    <span className="tnum shrink-0 text-[11px] text-muted-foreground">
+                    <span className="tnum shrink-0 text-[12px] text-muted-foreground">
                       ${formatUsd(Number(u.amount))}
                     </span>
                   </div>

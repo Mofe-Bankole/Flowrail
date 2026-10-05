@@ -75,7 +75,7 @@ export function MechanismScene() {
             <Window
               title="flowrail · classifier"
               meta={
-                <span className="flex items-center gap-1.5 text-[10px] tracking-wide text-muted-foreground uppercase">
+                <span className="flex items-center gap-1.5 text-[11px] tracking-wide text-muted-foreground uppercase">
                   <StatusDot tone={step === 3 ? "auto" : "idle"} />
                   step {step + 1}/4
                 </span>
@@ -105,7 +105,7 @@ export function MechanismScene() {
                   i === step ? "opacity-100" : "opacity-35"
                 }`}
               >
-                <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+                <p className="text-[12px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
                   {s.kicker}
                 </p>
                 <h2 className="mt-4 max-w-sm font-serif text-3xl leading-[1.06] tracking-[-0.01em] text-balance sm:text-4xl">
@@ -140,14 +140,14 @@ const routine = [...run.legs]
 
 function StepFigure({ kind }: { kind: (typeof STEPS)[number]["fig"] }) {
   const wrap =
-    "mt-6 max-w-sm border-l border-border/70 pl-3.5 text-[10px] leading-relaxed";
+    "mt-6 max-w-sm border-l border-border/70 pl-3.5 text-[11px] leading-relaxed";
 
   if (kind === "arrival") {
     return (
       <div className={wrap}>
         <div className="flex items-baseline justify-between gap-3">
           <span className="font-mono text-muted-foreground">0x91c4…0a3f</span>
-          <span className="tnum text-[11px]">${runTotal}</span>
+          <span className="tnum text-[12px]">${runTotal}</span>
         </div>
         <p className="mt-1 font-mono text-muted-foreground">
           memo — none · 1 tx · unlabelled
@@ -160,7 +160,7 @@ function StepFigure({ kind }: { kind: (typeof STEPS)[number]["fig"] }) {
     return (
       <div className={wrap}>
         <div className="flex items-baseline justify-between gap-3">
-          <span className="truncate text-[11px] text-foreground/85">
+          <span className="truncate text-[12px] text-foreground/85">
             {routine.name}
           </span>
           <span className="tnum shrink-0 font-mono text-muted-foreground">
@@ -237,7 +237,7 @@ function Gauge({
   const over = ratio > 1;
   return (
     <div className="flex items-center gap-2">
-      <span className="w-12 shrink-0 font-mono text-muted-foreground">{label}</span>
+      <span className="w-14 shrink-0 font-mono text-muted-foreground">{label}</span>
       <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-surface-sunken">
         <span
           className={`absolute inset-y-0 left-0 ${
@@ -251,10 +251,10 @@ function Gauge({
           style={{ left: `${(1 / capped) * 100}%` }}
         />
       </span>
-      <span className="tnum w-16 shrink-0 text-right font-mono text-muted-foreground">
+      <span className="tnum w-20 shrink-0 text-right font-mono text-muted-foreground">
         {read}
       </span>
-      <span className="w-10 shrink-0 text-right font-mono text-muted-foreground/70">
+      <span className="w-14 shrink-0 text-right font-mono text-muted-foreground/70">
         {cap}
       </span>
     </div>
@@ -264,12 +264,12 @@ function Gauge({
 function ArrivalState() {
   return (
     <div className="space-y-2.5">
-      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+      <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
         Inbound deposit · 1 tx · no memo
       </p>
       <div className="surface-sunken rounded-row p-4">
         <div className="flex items-baseline justify-between">
-          <span className="font-mono text-[11px] text-muted-foreground">
+          <span className="font-mono text-[12px] text-muted-foreground">
             0x91c4…0a3f
           </span>
           <span className="tnum font-serif text-3xl">${runTotal}</span>
@@ -282,15 +282,15 @@ function ArrivalState() {
             className="animate-cell-in flex items-center gap-3 rounded-[9px] border border-border/60 bg-card px-3 py-2"
             style={{ animationDelay: `${i * 70}ms` }}
           >
-            <span className="font-mono text-[10px] text-muted-foreground">
+            <span className="font-mono text-[11px] text-muted-foreground">
               {shortAddress(leg.address)}
             </span>
             <span className="h-px flex-1 bg-border" aria-hidden="true" />
-            <span className="tnum text-[11px]">${formatUsd(Number(leg.amount))}</span>
+            <span className="tnum text-[12px]">${formatUsd(Number(leg.amount))}</span>
           </div>
         ))}
         {legCount > 6 ? (
-          <p className="pt-1 text-[11px] text-muted-foreground">
+          <p className="pt-1 text-[12px] text-muted-foreground">
             …and {legCount - 6} more, none of them labelled.
           </p>
         ) : null}
@@ -302,7 +302,7 @@ function ArrivalState() {
 function IdentityState() {
   return (
     <div className="space-y-2">
-      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+      <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
         Roster match · {run.legs.length}/{run.legs.length} resolved
       </p>
       {sample.map((leg, i) => {
@@ -314,7 +314,7 @@ function IdentityState() {
             style={{ animationDelay: `${i * 80}ms` }}
           >
             <span
-              className={`grid size-5 shrink-0 place-items-center rounded-full text-[10px] font-bold ${
+              className={`grid size-5 shrink-0 place-items-center rounded-full text-[11px] font-bold ${
                 isNew
                   ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
                   : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
@@ -325,7 +325,7 @@ function IdentityState() {
             <span className="min-w-0 flex-1 truncate text-[12px] font-medium">
               {leg.name}
             </span>
-            <span className="shrink-0 font-mono text-[10px] text-muted-foreground">
+            <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
               {leg.stableForDays}d
             </span>
           </div>
@@ -339,7 +339,7 @@ function RuleState() {
   const overCap = sample.filter((l) => Number(l.amount) > 500);
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+      <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
         Two gates · all must pass
       </p>
       {[
@@ -357,7 +357,7 @@ function RuleState() {
         <div key={gate.label} className="surface-sunken rounded-row p-4">
           <div className="flex items-baseline justify-between gap-4">
             <span className="text-[12px]">{gate.label}</span>
-            <span className="tnum shrink-0 text-[11px] text-muted-foreground">
+            <span className="tnum shrink-0 text-[12px] text-muted-foreground">
               <b className="text-foreground">{gate.pass}</b>/{gate.total}
             </span>
           </div>
@@ -380,7 +380,7 @@ function RuleState() {
         <p className="text-[12px] font-medium text-amber-700 dark:text-amber-400">
           {overCap.length} line fails the cap
         </p>
-        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
           {overCap.map((l) => `${l.name} · $${formatUsd(Number(l.amount))}`).join(", ")}{" "}
           cannot be approved by a machine.
         </p>
@@ -399,7 +399,7 @@ function ResultState() {
         >
           <div className="flex items-center gap-2">
             <StatusDot tone="auto" />
-            <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
               Released
             </p>
           </div>
@@ -414,7 +414,7 @@ function ResultState() {
         >
           <div className="flex items-center gap-2">
             <StatusDot tone="finance" />
-            <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
               Held
             </p>
           </div>
@@ -424,7 +424,7 @@ function ResultState() {
           {exceptionLeg ? (
             <div className="mt-1 flex items-center gap-2">
               <TierChip tier="finance" />
-              <span className="truncate text-[11px] text-muted-foreground">
+              <span className="truncate text-[12px] text-muted-foreground">
                 {exceptionLeg.name}
               </span>
             </div>
@@ -432,7 +432,7 @@ function ResultState() {
         </div>
       </div>
       <div className="surface-sunken rounded-row p-4">
-        <p className="text-[11px] leading-relaxed text-muted-foreground">
+        <p className="text-[12px] leading-relaxed text-muted-foreground">
           The thirty-nine never touch the agency key. Each spends its own
           delegated key, capped and locked, and expires on its own.
         </p>
