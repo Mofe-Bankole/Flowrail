@@ -17,9 +17,10 @@ import {
 /**
  * Scene 01 — the product as the hero artwork.
  *
- * The desk is not an illustration below the headline; it is the headline's
- * subject and it bleeds past the viewport edge. Floating surfaces overlap both
- * columns so the composition reads with depth rather than as a stack of cards.
+ * The type stack sits centred on a narrow measure: status, headline, standfirst,
+ * actions. The desk sits below it at full container width — a bold centerpiece
+ * rather than a column beside the headline. Floating surfaces overlap the desk
+ * so the composition still reads with depth rather than as a stack of cards.
  */
 export function HeroScene() {
   const held = heldTotal();
@@ -41,10 +42,10 @@ export function HeroScene() {
         }}
       />
 
-      <div className="mx-auto grid max-w-[1500px] gap-x-10 gap-y-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.5fr)] lg:items-center">
-        {/* Type overlaps the interface rather than sitting above it. */}
-        <div className="relative lg:pr-6">
-          <p className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
+        {/* Centred type stack — narrow measure; the desk takes the stage below. */}
+        <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+          <p className="flex items-center justify-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
             <StatusDot tone="auto" />
             Run {run.id}
           </p>
@@ -53,11 +54,11 @@ export function HeroScene() {
             <br />
             {head.decision}
           </h1>
-          <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-muted-foreground">
+          <p className="mt-6 max-w-md text-[15px] leading-relaxed text-muted-foreground">
             {standfirst()}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a
               href="/app"
               className="inline-flex h-12 items-center rounded-pill bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-raised)] transition dur-fast ease-standard hover:bg-primary-strong"
@@ -72,8 +73,8 @@ export function HeroScene() {
             </a>
           </div>
 
-          {/* Floating: agency custody, sitting on the type column. */}
-          <div className="panel-float mt-10 hidden w-[19rem] rounded-card p-4 lg:block">
+          {/* Floating: agency custody, centred under the actions. */}
+          <div className="panel-float mx-auto mt-10 hidden w-[19rem] rounded-card p-4 text-left lg:block">
             <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
               Signing with
             </p>
@@ -87,8 +88,8 @@ export function HeroScene() {
           </div>
         </div>
 
-        {/* The desk. Deliberately oversized and edge-bleeding. */}
-        <div className="relative lg:-mr-[6vw]">
+        {/* The desk. Full container width, centred — the bold centerpiece. */}
+        <div className="relative mx-auto mt-16 w-full lg:mt-20">
           <Window
             title={`flowrail · run ${run.id}`}
             meta={

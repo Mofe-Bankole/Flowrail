@@ -140,11 +140,12 @@ deploys to Vercel where a sibling checkout and a child process do not exist.
 
 ## Documentation
 
-Start with the handoff. It is the only document that claims to be current.
+The **Status** section above is the current state of the project. Every other
+document is dated where it matters.
 
 | Document | Read it when you need to |
 |---|---|
-| [`docs/HANDOFF.md`](docs/HANDOFF.md) | **Start here.** Exact current state, what broke, what to do next. |
+| [`docs/HANDOFF.md`](docs/HANDOFF.md) | You want the 2026-10-01 snapshot of how work progressed. Superseded — see its banner. |
 | [`docs/KNOWLEDGE.md`](docs/KNOWLEDGE.md) | You are new to this codebase. The reasoning, the traps, and what is still open. |
 | [`docs/PROTOCOL.md`](docs/PROTOCOL.md) | You are touching Tempo selectors, limits, scopes, or witnesses. |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | You are signing anything, or changing what FlowRail may do. |

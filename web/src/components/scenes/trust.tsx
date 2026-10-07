@@ -221,7 +221,7 @@ export function TraceScene() {
           </h2>
         </Reveal>
 
-        <Reveal delay={100} className="panel-deep mt-14 overflow-hidden rounded-panel">
+        <Reveal delay={100} className="panel-deep mt-14 max-w-4xl overflow-hidden rounded-panel">
           <div className="flex flex-wrap items-center gap-3 border-b border-border/70 px-5 py-3.5">
             <span className="flex items-center gap-2 text-[11px]">
               <StatusDot tone="finance" />

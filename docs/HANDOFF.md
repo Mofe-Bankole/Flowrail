@@ -2,6 +2,13 @@
 
 _Written 2026-10-01. Read this before anything else._
 
+> **SUPERSEDED 2026-10-07.** This file is a snapshot of the state on 2026-10-01.
+> The defects in §4 have since been fixed: the CLI scripts run, the test suite is
+> 32 tests and green, and the product is deployed. For current state read the
+> **Status** section of [`README.md`](../README.md) and the submission checklist in
+> [`PLAN.md`](PLAN.md). Keep this file for the history and for the protocol
+> provenance in §8.
+
 ---
 
 ## 1. Product is confirmed

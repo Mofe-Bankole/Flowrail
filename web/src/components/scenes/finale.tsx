@@ -203,10 +203,10 @@ export function FinaleScene() {
           </Reveal>
         </div>
 
-        {/* The conclusion. */}
+        {/* The conclusion — centred stack, matching the hero's rhythm. */}
         <Reveal
           delay={200}
-          className="mt-20 flex flex-col items-start gap-8 lg:mt-24 lg:flex-row lg:items-end lg:justify-between"
+          className="mt-20 flex flex-col items-center gap-7 text-center lg:mt-24"
         >
           <div className="max-w-xl">
             <h3 className="font-serif text-3xl leading-[1.06] tracking-[-0.01em] text-balance sm:text-4xl">
