@@ -216,10 +216,14 @@ export function FinaleScene() {
               FlowRail sits in front of a Tempo wallet, decides what is routine,
               and escalates only what it should.
             </p>
+            <p className="mt-5 font-serif text-[17px] leading-snug italic text-foreground/75 text-balance">
+              Slow, or exposed — agencies have lived with those two. FlowRail,
+              on Tempo, is the third.
+            </p>
           </div>
           <a
             href="/app"
-            className="inline-flex h-14 shrink-0 items-center gap-3 rounded-pill bg-primary px-8 text-[15px] font-semibold text-primary-foreground shadow-[var(--shadow-float)] transition dur-fast ease-standard hover:bg-primary-strong"
+            className="inline-flex h-14 shrink-0 items-center gap-3 rounded-pill bg-primary px-8 text-[15px] font-semibold text-primary-foreground shadow-[var(--shadow-float)] transition dur-fast ease-standard hover:bg-primary-strong active:scale-[0.98]"
           >
             Open the desk
             <span aria-hidden="true">→</span>

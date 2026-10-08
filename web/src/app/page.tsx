@@ -10,7 +10,7 @@ import { FinaleScene } from "@/components/scenes/finale";
 export const metadata: Metadata = {
   title: "FlowRail — forty payees, one signature",
   description:
-    "FlowRail decides which agency payouts are routine and escalates only the ones that need a person. Built on Tempo.",
+    "Slow, or exposed — agencies have lived with those two. FlowRail, on Tempo, is the third. One approval becomes per-recipient payout keys the chain enforces.",
 };
 
 export default function Landing() {
@@ -18,7 +18,10 @@ export default function Landing() {
     <>
       <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1500px] items-center gap-6 px-5 py-3.5 sm:px-8">
-          <a href="#top" className="text-[15px] font-semibold tracking-tight">
+          <a
+            href="#top"
+            className="text-[15px] font-semibold tracking-tight transition-colors dur-fast hover:text-primary"
+          >
             FlowRail
           </a>
           <nav className="ml-auto hidden items-center gap-7 text-sm text-muted-foreground md:flex">

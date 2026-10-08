@@ -26,7 +26,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(next)}
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
-      className="inline-grid size-touch place-items-center rounded-pill border border-border bg-card text-foreground transition-colors dur-fast ease-standard hover:bg-accent hover:text-accent-foreground"
+      className="inline-grid size-touch place-items-center rounded-pill border border-border bg-card text-foreground transition dur-fast ease-standard hover:bg-accent hover:text-accent-foreground active:scale-[0.92]"
     >
       <svg
         viewBox="0 0 24 24"

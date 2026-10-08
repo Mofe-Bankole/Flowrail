@@ -61,13 +61,13 @@ export function HeroScene() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a
               href="/app"
-              className="inline-flex h-12 items-center rounded-pill bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-raised)] transition dur-fast ease-standard hover:bg-primary-strong"
+              className="inline-flex h-12 items-center rounded-pill bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-raised)] transition dur-fast ease-standard hover:bg-primary-strong active:scale-[0.98]"
             >
               Open the desk
             </a>
             <a
               href="#mechanism"
-              className="inline-flex h-12 items-center rounded-pill px-5 text-sm font-medium text-muted-foreground transition dur-fast ease-standard hover:text-foreground"
+              className="inline-flex h-12 items-center rounded-pill px-5 text-sm font-medium text-muted-foreground transition dur-fast ease-standard hover:text-foreground active:scale-[0.98]"
             >
               Watch it decide
             </a>

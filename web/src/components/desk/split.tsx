@@ -77,7 +77,7 @@ export function Split({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onSelect(on ? null : d.key)}
-                className={`min-w-0 flex-1 rounded-row border px-4 py-3 text-left transition dur-standard ease-standard sm:flex-none sm:w-56 ${
+                className={`min-w-0 flex-1 rounded-row border px-4 py-3 text-left transition dur-standard ease-standard active:scale-[0.98] sm:flex-none sm:w-56 ${
                   on
                     ? "border-primary/40 bg-primary/8 shadow-[var(--shadow-raised)]"
                     : "border-border bg-card hover:border-border/80 hover:bg-surface-sunken"
@@ -115,7 +115,7 @@ export function Split({
               aria-label={`${d.label} — $${d.value.toFixed(2)}, ${d.legs} lines`}
               onClick={() => onSelect(selected === d.key ? null : d.key)}
               style={{ flexGrow: d.share, flexBasis: 0 }}
-              className={`group relative overflow-hidden rounded-row border text-left transition dur-standard ease-standard ${
+              className={`group relative overflow-hidden rounded-row border text-left transition dur-standard ease-standard active:brightness-95 ${
                 d.key === "auto"
                   ? "border-emerald-500/30 bg-emerald-500/12 hover:bg-emerald-500/18"
                   : "border-amber-500/35 bg-amber-500/14 hover:bg-amber-500/20"

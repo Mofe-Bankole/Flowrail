@@ -219,6 +219,12 @@ export function TraceScene() {
           <h2 className="mt-4 font-serif text-4xl leading-[1.04] tracking-[-0.01em] text-balance sm:text-5xl">
             Three checks the chain runs before FlowRail gets a vote.
           </h2>
+          <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
+            Tempo makes authorization native: caps, expiry, recipient scope as
+            first-class account operations, no custom contract. Remove Tempo and
+            FlowRail has nothing left to refuse with — the limits live on-chain,
+            not in our review logic.
+          </p>
         </Reveal>
 
         <Reveal delay={100} className="panel-deep mt-14 max-w-4xl overflow-hidden rounded-panel">

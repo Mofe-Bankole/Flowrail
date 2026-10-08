@@ -20,7 +20,10 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-full bg-background">
       <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-[1500px] items-center gap-4 px-5 py-3 sm:px-8">
-          <Link href="/" className="text-[15px] font-semibold tracking-tight">
+          <Link
+            href="/"
+            className="text-[15px] font-semibold tracking-tight transition-colors dur-fast hover:text-primary"
+          >
             FlowRail
           </Link>
           <span className="text-[13px] text-muted-foreground">Desk</span>

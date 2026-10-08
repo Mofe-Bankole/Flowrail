@@ -2,7 +2,7 @@
 
 # FlowRail
 
-**One customer signature. A fleet of narrowly scoped payout keys. Every payment provable on-chain.**
+**Slow, or exposed — agencies have lived with those two. FlowRail, on Tempo, is the third.**
 
 [flowrail.vercel.app](https://flowrail.vercel.app/)
 

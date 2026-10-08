@@ -160,7 +160,7 @@ export function Desk({
                   <button
                     type="button"
                     onClick={() => void wallet.disconnect()}
-                    className="shrink-0 rounded-pill border border-border px-4 py-2 text-[13px] transition dur-fast ease-standard hover:bg-surface-sunken"
+                    className="shrink-0 rounded-pill border border-border px-4 py-2 text-[13px] transition dur-fast ease-standard hover:bg-surface-sunken active:scale-[0.98]"
                   >
                     Disconnect {shortAddress(wallet.address)}
                   </button>
@@ -169,9 +169,36 @@ export function Desk({
                     type="button"
                     disabled={wallet.connecting}
                     onClick={() => void wallet.connect()}
-                    className="shrink-0 rounded-pill bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground transition dur-fast ease-standard hover:bg-primary-strong disabled:opacity-60"
+                    className="shrink-0 rounded-pill bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground transition dur-fast ease-standard hover:bg-primary-strong active:scale-[0.98] disabled:opacity-60"
                   >
-                    {wallet.connecting ? "Opening wallet" : "Connect to sign"}
+                    {wallet.connecting ? (
+                      <span className="inline-flex items-center gap-2">
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="size-3 animate-spin"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            stroke="currentColor"
+                            strokeOpacity="0.3"
+                            strokeWidth="3"
+                          />
+                          <path
+                            d="M21 12a9 9 0 0 0-9-9"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        Opening wallet
+                      </span>
+                    ) : (
+                      "Connect to sign"
+                    )}
                   </button>
                 )}
               </div>
@@ -212,7 +239,7 @@ export function Desk({
                           className={`flex w-full items-center gap-2.5 border-b border-border/40 px-3.5 py-2 text-left transition dur-fast ${
                             openLeg === leg.payeeId
                               ? "bg-surface-sunken"
-                              : "hover:bg-surface-sunken/60"
+                              : "hover:bg-surface-sunken/60 active:bg-surface-sunken"
                           } ${c === 1 ? "" : ""}`}
                         >
                           <StatusDot tone="auto" />
@@ -361,12 +388,12 @@ export function Desk({
             type="button"
             onClick={() => setShowLevels(v => !v)}
             aria-expanded={showLevels}
-            className="flex w-full items-center justify-between gap-4 text-left"
+            className="group flex w-full items-center justify-between gap-4 text-left"
           >
-            <span className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+            <span className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase transition-colors dur-fast group-hover:text-foreground">
               Chain detail
             </span>
-            <span className="font-mono text-[10px] text-muted-foreground">
+            <span className="font-mono text-[10px] text-muted-foreground transition-colors dur-fast group-hover:text-foreground">
               {showLevels ? "hide" : "show"}
             </span>
           </button>
