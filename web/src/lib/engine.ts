@@ -14,6 +14,8 @@ export type EngineLeg = DemoLeg;
 
 export type EngineRun = {
   id: string;
+  /** When the engine produced the run — the desk shows it as orientation. */
+  generatedAt: string;
   counts: Record<Tier, number>;
   /**
    * The thresholds this run was decided against, carried from the artefact.
@@ -32,6 +34,7 @@ export type EngineRun = {
 export async function classifyInvoice(): Promise<EngineRun> {
   return {
     id: run.id,
+    generatedAt: run.generatedAt,
     counts: run.counts,
     policy: run.policy,
     unresolved: run.unresolved,

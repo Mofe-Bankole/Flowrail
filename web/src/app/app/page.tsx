@@ -39,6 +39,7 @@ export default async function DeskPage() {
     <Desk
       run={{
         id: runResult.value.id,
+        generatedAt: runResult.value.generatedAt,
         legs: runResult.value.legs,
         policy: runResult.value.policy,
         unresolved: runResult.value.unresolved,

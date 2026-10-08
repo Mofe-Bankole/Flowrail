@@ -29,7 +29,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
           <span className="text-[13px] text-muted-foreground">Desk</span>
           <div className="ml-auto flex items-center gap-3">
             {wallet.address ? (
-              <span className="hidden font-mono text-[10px] text-muted-foreground sm:inline">
+              <span className="hidden font-mono text-[11px] text-muted-foreground sm:inline">
                 connected · {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}
               </span>
             ) : null}

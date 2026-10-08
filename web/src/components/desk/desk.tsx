@@ -27,6 +27,7 @@ export function Desk({
 }: {
   run: {
     id: string;
+    generatedAt: string;
     legs: DemoLeg[];
     policy: { autoCap: string; addressStabilityDays: number };
     unresolved: { payeeId: string; amount: string }[];
@@ -77,353 +78,388 @@ export function Desk({
   const oneDecision = held.length === 1 ? held[0] : null;
 
   return (
-    <div className="flex flex-col gap-16 lg:gap-24">
-      {/* 1 — the answer */}
-      <Reveal>
-        <Split
-          total={total}
-          totalLegs={run.legs.length}
-          destinations={destinations}
-          autoCap={autoCap}
-          selected={selected}
-          onSelect={setSelected}
-        />
-      </Reveal>
+    <>
+      {/*
+        Orientation before analysis: which run, when it was generated, and the
+        policy it was decided against — the questions a reviewer asks before
+        the split answers anything.
+      */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-border pb-5">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <h1 className="font-serif text-xl leading-none tracking-[-0.01em]">
+            Run {run.id}
+          </h1>
+          <span className="font-mono text-[11px] text-muted-foreground">
+            {new Date(run.generatedAt).toISOString().slice(0, 16).replace("T", " ")} UTC
+          </span>
+        </div>
+        <p className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-[11px] text-muted-foreground">
+          <span>
+            auto cap <span className="tnum text-foreground/80">${autoCap}</span>
+          </span>
+          <span>
+            tenure <span className="tnum text-foreground/80">≥ {stabilityDays}d</span>
+          </span>
+          <span>
+            token <span className="text-foreground/80">pathUSD</span>
+          </span>
+        </p>
+      </div>
 
-      {/* 2 — the one thing that needs a person */}
-      {oneDecision && showHeld ? (
-        <Reveal delay={80}>
-          <section aria-labelledby="decision-h" className="border-t border-border pt-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
-              <h2
-                id="decision-h"
-                className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-              >
-                Waiting on you · one line
-              </h2>
-              <p className="font-mono text-[10px] text-muted-foreground">
-                {held.length} of {run.legs.length} lines ·{" "}
-                <span className="tnum">{((heldValue / total) * 100).toFixed(1)}%</span> of
-                the run
-              </p>
-            </div>
+      <div className="mt-10 flex flex-col gap-16 lg:gap-24">
+        {/* 1 — the answer */}
+        <Reveal>
+          <Split
+            total={total}
+            totalLegs={run.legs.length}
+            destinations={destinations}
+            autoCap={autoCap}
+            selected={selected}
+            onSelect={setSelected}
+          />
+        </Reveal>
 
-            <div className="panel-raised mt-5 rounded-panel shadow-[var(--shadow-float)]">
-              <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-5 p-6">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2.5">
-                    <StatusDot tone={oneDecision.tier} />
-                    <p className="font-serif text-2xl leading-tight">
-                      {oneDecision.name}
+        {/* 2 — the one thing that needs a person */}
+        {oneDecision && showHeld ? (
+          <Reveal delay={80}>
+            <section aria-labelledby="decision-h" className="border-t border-t-amber-500/30 pt-8">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+                <h2
+                  id="decision-h"
+                  className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-foreground uppercase"
+                >
+                  <StatusDot tone="finance" />
+                  Waiting on you · one line
+                </h2>
+                <p className="font-mono text-[11px] text-muted-foreground">
+                  {held.length} of {run.legs.length} lines ·{" "}
+                  <span className="tnum">{((heldValue / total) * 100).toFixed(1)}%</span> of
+                  the run
+                </p>
+              </div>
+
+              <div className="panel-raised mt-5 rounded-panel shadow-[var(--shadow-float)]">
+                <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-5 p-6">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2.5">
+                      <StatusDot tone={oneDecision.tier} />
+                      <p className="font-serif text-2xl leading-tight">
+                        {oneDecision.name}
+                      </p>
+                    </div>
+                    <p className="mt-1.5 text-[13px] text-muted-foreground">
+                      {oneDecision.role} · stable{" "}
+                      <span className="tnum">{oneDecision.stableForDays}d</span>
+                    </p>
+                    <p className="tnum mt-5 font-serif text-[clamp(2rem,5vw,3.25rem)] leading-none text-amber-600 dark:text-amber-400">
+                      ${formatUsd(Number(oneDecision.amount))}
                     </p>
                   </div>
-                  <p className="mt-1.5 text-[12px] text-muted-foreground">
-                    {oneDecision.role} · stable{" "}
-                    <span className="tnum">{oneDecision.stableForDays}d</span>
-                  </p>
-                  <p className="tnum mt-5 font-serif text-[clamp(2rem,5vw,3.25rem)] leading-none text-amber-600 dark:text-amber-400">
-                    ${formatUsd(Number(oneDecision.amount))}
-                  </p>
+
+                  {/* The gate, drawn. This line stopped here, for these reasons. */}
+                  <div className="w-full max-w-sm">
+                    <Gate
+                      label="amount"
+                      value={Number(oneDecision.amount)}
+                      cap={autoCap}
+                      capLabel={`≤ $${autoCap}`}
+                      over
+                    />
+                    <Gate
+                      label="tenure"
+                      value={oneDecision.stableForDays}
+                      cap={stabilityDays}
+                      capLabel={`≥ ${stabilityDays}d`}
+                      pass
+                    />
+                <p className="mt-3 font-mono text-[12px] leading-relaxed text-muted-foreground">
+                      {oneDecision.reason}
+                    </p>
+                  </div>
                 </div>
 
-                {/* The gate, drawn. This line stopped here, for these reasons. */}
-                <div className="w-full max-w-sm">
-                  <Gate
-                    label="amount"
-                    value={Number(oneDecision.amount)}
-                    cap={autoCap}
-                    capLabel={`≤ $${autoCap}`}
-                    over
-                  />
-                  <Gate
-                    label="tenure"
-                    value={oneDecision.stableForDays}
-                    cap={stabilityDays}
-                    capLabel={`≥ ${stabilityDays}d`}
-                    pass
-                  />
-                  <p className="mt-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
-                    {oneDecision.reason}
+                <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/70 px-6 py-4">
+                  <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground">
+                    {wallet.address
+                      ? "Wallet connected. Signing this line is not wired to a contract yet — settlement is blocked on the transfer policy, not on you."
+                      : `One signature releases this line. The other ${auto.length} need${
+                          auto.length === 1 ? "s" : ""
+                        } nothing from you.`}
                   </p>
+                  {wallet.address ? (
+                    <button
+                      type="button"
+                      onClick={() => void wallet.disconnect()}
+                      className="shrink-0 rounded-pill border border-border px-4 py-2 text-[13px] transition dur-fast ease-standard hover:bg-surface-sunken active:scale-[0.98]"
+                    >
+                      Disconnect {shortAddress(wallet.address)}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={wallet.connecting}
+                      onClick={() => void wallet.connect()}
+                      className="shrink-0 rounded-pill bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground transition dur-fast ease-standard hover:bg-primary-strong active:scale-[0.98] disabled:opacity-60"
+                    >
+                      {wallet.connecting ? (
+                        <span className="inline-flex items-center gap-2">
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="size-3 animate-spin"
+                            fill="none"
+                            aria-hidden="true"
+                          >
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="9"
+                              stroke="currentColor"
+                              strokeOpacity="0.3"
+                              strokeWidth="3"
+                            />
+                            <path
+                              d="M21 12a9 9 0 0 0-9-9"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          Opening wallet
+                        </span>
+                      ) : (
+                        "Connect to sign"
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
+            </section>
+          </Reveal>
+        ) : null}
 
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/70 px-6 py-4">
-                <p className="max-w-md text-[12px] leading-relaxed text-muted-foreground">
-                  {wallet.address
-                    ? "Wallet connected. Signing this line is not wired to a contract yet — settlement is blocked on the transfer policy, not on you."
-                    : `One signature releases this line. The other ${auto.length} need${
-                        auto.length === 1 ? "s" : ""
-                      } nothing from you.`}
+        {/* 3 — the evidence */}
+        {showAuto && auto.length > 0 ? (
+          <Reveal delay={120}>
+            <section aria-labelledby="lines-h" className="border-t border-border pt-8">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+                <h2
+                  id="lines-h"
+                  className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                >
+                  Released without you · {auto.length} lines
+                </h2>
+                <p className="tnum font-mono text-[11px] text-muted-foreground">
+                  ${formatUsd(autoValue)} · largest ${formatUsd(
+                    Math.max(...auto.map((l) => Number(l.amount))),
+                  )}
                 </p>
-                {wallet.address ? (
-                  <button
-                    type="button"
-                    onClick={() => void wallet.disconnect()}
-                    className="shrink-0 rounded-pill border border-border px-4 py-2 text-[13px] transition dur-fast ease-standard hover:bg-surface-sunken active:scale-[0.98]"
-                  >
-                    Disconnect {shortAddress(wallet.address)}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={wallet.connecting}
-                    onClick={() => void wallet.connect()}
-                    className="shrink-0 rounded-pill bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground transition dur-fast ease-standard hover:bg-primary-strong active:scale-[0.98] disabled:opacity-60"
-                  >
-                    {wallet.connecting ? (
-                      <span className="inline-flex items-center gap-2">
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="size-3 animate-spin"
-                          fill="none"
-                          aria-hidden="true"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="9"
-                            stroke="currentColor"
-                            strokeOpacity="0.3"
-                            strokeWidth="3"
-                          />
-                          <path
-                            d="M21 12a9 9 0 0 0-9-9"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        Opening wallet
-                      </span>
-                    ) : (
-                      "Connect to sign"
-                    )}
-                  </button>
-                )}
               </div>
-            </div>
-          </section>
-        </Reveal>
-      ) : null}
 
-      {/* 3 — the evidence */}
-      {showAuto && auto.length > 0 ? (
-        <Reveal delay={120}>
-          <section aria-labelledby="lines-h" className="border-t border-border pt-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+              <div className="panel-raised mt-5 rounded-panel shadow-[var(--shadow-panel)]">
+                <div className="grid grid-cols-1 sm:grid-cols-2">
+                  {[auto.slice(0, Math.ceil(auto.length / 2)), auto.slice(Math.ceil(auto.length / 2))].map(
+                    (col, c) => (
+                      <div
+                        key={c}
+                        className={
+                          c === 1 ? "border-t border-border/50 sm:border-t-0 sm:border-l" : ""
+                        }
+                      >
+                        {col.map((leg) => (
+                          <button
+                            key={leg.payeeId}
+                            type="button"
+                            onClick={() => setOpenLeg(openLeg === leg.payeeId ? null : leg.payeeId)}
+                            aria-expanded={openLeg === leg.payeeId}
+                            className={`flex w-full items-center gap-2.5 border-b border-border/40 px-3.5 py-2 text-left transition dur-fast ${
+                              openLeg === leg.payeeId
+                                ? "bg-surface-sunken"
+                                : "hover:bg-surface-sunken/60 active:bg-surface-sunken"
+                            } ${c === 1 ? "" : ""}`}
+                          >
+                            <StatusDot tone="auto" />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-[13px] leading-tight font-medium">
+                                {leg.name}
+                              </span>
+                              <span className="block truncate font-mono text-[11px] leading-tight text-muted-foreground">
+                                {leg.role} · {leg.stableForDays}d
+                              </span>
+                            </span>
+                            <span className="tnum shrink-0 text-[13px] text-muted-foreground">
+                              ${formatUsd(Number(leg.amount))}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ),
+                  )}
+                </div>
+
+                {openLeg ? (
+                  <div className="animate-cell-in border-t border-border/70 bg-surface-sunken/60 px-3.5 py-3 font-mono text-[11px] text-muted-foreground">
+                    {(() => {
+                      const leg = auto.find((l) => l.payeeId === openLeg);
+                      if (!leg) return null;
+                      return (
+                        <span className="flex flex-wrap gap-x-6 gap-y-1">
+                          <span>reason · {leg.reason}</span>
+                          <span>address · {leg.address}</span>
+                          <span>stable {leg.stableForDays}d</span>
+                        </span>
+                      );
+                    })()}
+                  </div>
+                ) : null}
+              </div>
+
+              <p className="mt-2.5 font-mono text-[11px] text-muted-foreground">
+                select a line for its reason and address
+              </p>
+            </section>
+          </Reveal>
+        ) : null}
+
+        {/* 4 — money that never entered the run */}
+        {run.unresolved.length > 0 && selected === null ? (
+          <Reveal delay={160}>
+            <section aria-labelledby="unmatched-h" className="border-t border-border pt-8">
               <h2
-                id="lines-h"
+                id="unmatched-h"
                 className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
               >
-                Released without you · {auto.length} lines
+                Outside the run · {run.unresolved.length} line
               </h2>
-              <p className="tnum font-mono text-[10px] text-muted-foreground">
-                ${formatUsd(autoValue)} · largest ${formatUsd(
-                  Math.max(...auto.map((l) => Number(l.amount))),
-                )}
-              </p>
-            </div>
-
-            <div className="panel-raised mt-5 rounded-panel shadow-[var(--shadow-panel)]">
-              <div className="grid grid-cols-2 divide-x divide-border/50">
-                {[auto.slice(0, Math.ceil(auto.length / 2)), auto.slice(Math.ceil(auto.length / 2))].map(
-                  (col, c) => (
-                    <div key={c} className={c === 1 ? "hidden sm:block" : ""}>
-                      {col.map((leg) => (
-                        <button
-                          key={leg.payeeId}
-                          type="button"
-                          onClick={() => setOpenLeg(openLeg === leg.payeeId ? null : leg.payeeId)}
-                          aria-expanded={openLeg === leg.payeeId}
-                          className={`flex w-full items-center gap-2.5 border-b border-border/40 px-3.5 py-2 text-left transition dur-fast ${
-                            openLeg === leg.payeeId
-                              ? "bg-surface-sunken"
-                              : "hover:bg-surface-sunken/60 active:bg-surface-sunken"
-                          } ${c === 1 ? "" : ""}`}
-                        >
-                          <StatusDot tone="auto" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-[12px] leading-tight font-medium">
-                              {leg.name}
-                            </span>
-                            <span className="block truncate font-mono text-[10px] leading-tight text-muted-foreground">
-                              {leg.role} · {leg.stableForDays}d
-                            </span>
-                          </span>
-                          <span className="tnum shrink-0 text-[12px] text-muted-foreground">
-                            ${formatUsd(Number(leg.amount))}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  ),
-                )}
-              </div>
-
-              {openLeg ? (
-                <div className="animate-cell-in border-t border-border/70 bg-surface-sunken/60 px-3.5 py-3 font-mono text-[10px] text-muted-foreground">
-                  {(() => {
-                    const leg = auto.find((l) => l.payeeId === openLeg);
-                    if (!leg) return null;
-                    return (
-                      <span className="flex flex-wrap gap-x-6 gap-y-1">
-                        <span>reason · {leg.reason}</span>
-                        <span>address · {leg.address}</span>
-                        <span>stable {leg.stableForDays}d</span>
-                      </span>
-                    );
-                  })()}
-                </div>
-              ) : null}
-            </div>
-
-            <p className="mt-2.5 font-mono text-[10px] text-muted-foreground">
-              select a line for its reason and address
-            </p>
-          </section>
-        </Reveal>
-      ) : null}
-
-      {/* 4 — money that never entered the run */}
-      {run.unresolved.length > 0 && selected === null ? (
-        <Reveal delay={160}>
-          <section aria-labelledby="unmatched-h" className="border-t border-border pt-8">
-            <h2
-              id="unmatched-h"
-              className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-            >
-              Outside the run · {run.unresolved.length} line
-            </h2>
-            <div className="panel-raised mt-5 rounded-panel px-5 py-4 shadow-[var(--shadow-panel)]">
-              {run.unresolved.map((u) => (
-                <div key={u.payeeId} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <StatusDot tone="idle" />
-                  <span className="font-mono text-[12px]">{u.payeeId}</span>
-                  <span className="text-[12px] text-muted-foreground">
-                    is not on the roster, so it was never given a key
-                  </span>
-                  <span className="tnum ml-auto text-[12px] text-muted-foreground">
-                    ${formatUsd(Number(u.amount))}
-                  </span>
-                </div>
-              ))}
-              <p className="mt-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
-                <span className="tnum">${formatUsd(unmatched)}</span> counted here and
-                excluded from the split above. A line with no payee is not dropped — it
-                is the one thing FlowRail will never guess at.
-              </p>
-            </div>
-          </section>
-        </Reveal>
-      ) : null}
-
-      {/* 5 — why the split is worth trusting */}
-      <Reveal delay={200}>
-        <section aria-labelledby="proof-h" className="border-t border-border pt-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
-            <h2
-              id="proof-h"
-              className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
-            >
-              What a key can and cannot do
-            </h2>
-            <p className="font-mono text-[10px] text-muted-foreground">
-              {probeRecords.length} transactions · Moderato
-            </p>
-          </div>
-
-          <ol className="mt-5 grid gap-3 md:grid-cols-2">
-            {probeRecords.map((r, i) => {
-              const held = /rejected|did not hold/.test(r.why);
-              return (
-                <li
-                  key={r.tx}
-                  className={`panel-raised rounded-panel p-4 ${
-                    held ? "shadow-[var(--shadow-raised)]" : "shadow-none"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span
-                      className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-                        held
-                          ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
-                          : "bg-emerald-500/18 text-emerald-700 dark:text-emerald-300"
-                      }`}
-                    >
-                      {held ? "✕" : "✓"}
+              <div className="panel-raised mt-5 rounded-panel px-5 py-4 shadow-[var(--shadow-panel)]">
+                {run.unresolved.map((u) => (
+                  <div key={u.payeeId} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <StatusDot tone="idle" />
+                    <span className="font-mono text-[13px]">{u.payeeId}</span>
+                    <span className="text-[13px] text-muted-foreground">
+                      is not on the roster, so it was never given a key
                     </span>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {i + 1} / {probeRecords.length}
+                    <span className="tnum ml-auto text-[13px] text-muted-foreground">
+                      ${formatUsd(Number(u.amount))}
                     </span>
                   </div>
-                  <p className="mt-3 text-[12px] leading-snug font-medium">{r.what}</p>
-                  <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
-                    {r.why}
-                  </p>
-                  <a
-                    href={r.href}
-                    className="mt-2.5 block truncate font-mono text-[10px] text-muted-foreground underline-offset-4 hover:underline"
+                ))}
+                <p className="mt-3 font-mono text-[11px] leading-relaxed text-muted-foreground">
+                  <span className="tnum">${formatUsd(unmatched)}</span> counted here and
+                  excluded from the split above. A line with no payee is not dropped — it
+                  is the one thing FlowRail will never guess at.
+                </p>
+              </div>
+            </section>
+          </Reveal>
+        ) : null}
+
+        {/* 5 — why the split is worth trusting */}
+        <Reveal delay={200}>
+          <section aria-labelledby="proof-h" className="border-t border-border pt-8">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+              <h2
+                id="proof-h"
+                className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+              >
+                What a key can and cannot do
+              </h2>
+              <p className="font-mono text-[11px] text-muted-foreground">
+                {probeRecords.length} transactions · Moderato
+              </p>
+            </div>
+
+            <ol className="mt-5 grid gap-3 md:grid-cols-2">
+              {probeRecords.map((r, i) => {
+                const held = /rejected|did not hold/.test(r.why);
+                return (
+                  <li
+                    key={r.tx}
+                    className={`panel-raised rounded-panel p-4 ${
+                      held ? "shadow-[var(--shadow-raised)]" : "shadow-none"
+                    }`}
                   >
-                    {r.tx.slice(0, 14)}…{r.tx.slice(-6)}
-                  </a>
-                </li>
-              )
-            })}
-          </ol>
+                    <div className="flex items-center justify-between gap-3">
+                      <span
+                        className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${
+                          held
+                            ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                            : "bg-emerald-500/18 text-emerald-700 dark:text-emerald-300"
+                        }`}
+                      >
+                        {held ? "✕" : "✓"}
+                      </span>
+                      <span className="font-mono text-[11px] text-muted-foreground">
+                        {i + 1} / {probeRecords.length}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-[13px] leading-snug font-medium">{r.what}</p>
+                    <p className="mt-2.5 text-[12px] leading-relaxed text-muted-foreground">
+                      {r.why}
+                    </p>
+                    <a
+                      href={r.href}
+                      className="mt-2.5 block truncate font-mono text-[11px] text-muted-foreground underline-offset-4 hover:underline"
+                    >
+                      {r.tx.slice(0, 14)}…{r.tx.slice(-6)}
+                    </a>
+                  </li>
+                )
+              })}
+            </ol>
 
-          <p className="mt-4 max-w-2xl text-[12px] leading-relaxed text-muted-foreground">
-            An amount cap alone is not a lock. The third transaction spent to a
-            recipient that was never allowlisted, and it succeeded. Only{" "}
-            <span className="text-foreground/85">setAllowedCalls</span> — naming
-            one recipient — made the fourth transaction revert.
-          </p>
-        </section>
-      </Reveal>
-
-      {/* 6 — level 4. Present, but behind a disclosure. */}
-      <Reveal delay={240}>
-        <section className="border-t border-border pt-8">
-          <button
-            type="button"
-            onClick={() => setShowLevels(v => !v)}
-            aria-expanded={showLevels}
-            className="group flex w-full items-center justify-between gap-4 text-left"
-          >
-            <span className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase transition-colors dur-fast group-hover:text-foreground">
-              Chain detail
-            </span>
-            <span className="font-mono text-[10px] text-muted-foreground transition-colors dur-fast group-hover:text-foreground">
-              {showLevels ? "hide" : "show"}
-            </span>
-          </button>
-
-          {showLevels ? (
-            <dl className="animate-cell-in mt-4 grid gap-x-8 gap-y-2 font-mono text-[10px] sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                ["chain id", chain ? String(chain.chainId) : "—"],
-                ["block", chain ? chain.head : "—"],
-                ["agency account", chain ? chain.address : "—"],
-                ["pathUSD balance", chain ? chain.pathUsd : "—"],
-                ["run", run.id],
-                ["settled", "0 · executeBatch has no batch primitive"],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3 border-b border-border/40 pb-1.5">
-                  <dt className="text-muted-foreground">{k}</dt>
-                  <dd className="tnum truncate text-right">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-
-          {chainError ? (
-            <p className="mt-3 font-mono text-[10px] text-muted-foreground">
-              chain unreachable · {chainError}
+            <p className="mt-4 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
+              An amount cap alone is not a lock. The third transaction spent to a
+              recipient that was never allowlisted, and it succeeded. Only{" "}
+              <span className="text-foreground/85">setAllowedCalls</span> — naming
+              one recipient — made the fourth transaction revert.
             </p>
-          ) : null}
-        </section>
-      </Reveal>
-    </div>
+          </section>
+        </Reveal>
+
+        {/* 6 — level 4. Present, but behind a disclosure. */}
+        <Reveal delay={240}>
+          <section className="border-t border-border pt-8">
+            <button
+              type="button"
+              onClick={() => setShowLevels(v => !v)}
+              aria-expanded={showLevels}
+              className="group flex w-full items-center justify-between gap-4 text-left"
+            >
+              <span className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase transition-colors dur-fast group-hover:text-foreground">
+                Chain detail
+              </span>
+              <span className="font-mono text-[11px] text-muted-foreground transition-colors dur-fast group-hover:text-foreground">
+                {showLevels ? "hide" : "show"}
+              </span>
+            </button>
+
+            {showLevels ? (
+              <dl className="animate-cell-in mt-4 grid gap-x-8 gap-y-2 font-mono text-[11px] sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  ["chain id", chain ? String(chain.chainId) : "—"],
+                  ["block", chain ? chain.head : "—"],
+                  ["agency account", chain ? chain.address : "—"],
+                  ["pathUSD balance", chain ? chain.pathUsd : "—"],
+                  ["run", run.id],
+                  ["settled", "0 · executeBatch has no batch primitive"],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-3 border-b border-border/40 pb-1.5">
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd className="tnum truncate text-right">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+
+            {chainError ? (
+              <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+                chain unreachable · {chainError}
+              </p>
+            ) : null}
+          </section>
+        </Reveal>
+      </div>
+    </>
   );
 }
 
@@ -446,7 +482,7 @@ function Gate({
   const scale = Math.max(value, cap) * 1.12;
   return (
     <div className="mb-2.5 flex items-center gap-2.5">
-      <span className="w-14 shrink-0 font-mono text-[11px] text-muted-foreground">
+      <span className="w-14 shrink-0 font-mono text-[12px] text-muted-foreground">
         {label}
       </span>
       <span className="relative h-2 flex-1 overflow-hidden rounded-full bg-surface-sunken">
@@ -461,10 +497,10 @@ function Gate({
           style={{ left: `${(cap / scale) * 100}%` }}
         />
       </span>
-      <span className="tnum w-20 shrink-0 text-right font-mono text-[11px]">
+      <span className="tnum w-20 shrink-0 text-right font-mono text-[12px]">
         {label === "amount" ? `$${formatUsd(value)}` : `${value}d`}
       </span>
-      <span className="w-12 shrink-0 text-right font-mono text-[10px] text-muted-foreground/70">
+      <span className="w-12 shrink-0 text-right font-mono text-[11px] text-muted-foreground/70">
         {capLabel}
       </span>
     </div>

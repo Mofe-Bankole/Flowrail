@@ -54,9 +54,9 @@ export function Split({
     <section aria-labelledby="split-h" className="relative">
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
         <div>
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+          <h2 id="split-h" className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
             Run {heldLine ? "divided" : "divides"} by the rule
-          </p>
+          </h2>
           <p className="tnum mt-6 font-serif text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.9] tracking-[-0.03em]">
             ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
@@ -89,14 +89,14 @@ export function Split({
                       d.key === "auto" ? "bg-emerald-500" : "bg-amber-500"
                     }`}
                   />
-                  <span className="text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                  <span className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
                     {d.legs} {d.legs === 1 ? "line" : "lines"}
                   </span>
                 </span>
                 <span className="tnum mt-2 block font-serif text-xl">
                   ${d.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
-                <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">
+                <span className="mt-0.5 block text-[12px] leading-snug text-muted-foreground">
                   {d.label}
                 </span>
               </button>
@@ -144,7 +144,7 @@ export function Split({
                   className="absolute inset-y-0 w-px bg-amber-600/70"
                   style={{ left: `${(autoCap / d.value) * 100}%` }}
                 >
-                  <span className="tnum absolute top-1.5 -left-1 hidden rounded-surface-sunken bg-amber-500/20 px-1 font-mono text-[9px] text-amber-700 sm:block dark:text-amber-300">
+                  <span                   className="tnum absolute top-1.5 -left-1 hidden rounded-surface-sunken bg-amber-500/20 px-1 font-mono text-[10px] text-amber-700 sm:block dark:text-amber-300">
                     ${autoCap} cap
                   </span>
                 </span>
@@ -154,7 +154,7 @@ export function Split({
         </div>
 
         {/* Proportional counts: 39 of 40 is a hairline. State that plainly. */}
-        <p className="mt-2.5 font-mono text-[10px] text-muted-foreground">
+        <p className="mt-2.5 font-mono text-[11px] text-muted-foreground">
           widths are share of value · by line count the split is{" "}
           <span className="tnum">
             {auto.legs}/{totalLegs}
