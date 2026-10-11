@@ -20,8 +20,9 @@ import {
   sumAmount,
 } from "@/lib/demo";
 
-/** Cells shown on phones before the grid collapses to a count. */
+/** Routine cells shown before the grid collapses to a count; the exception is always shown. */
 const MOBILE_CELLS = 5;
+const DESKTOP_CELLS = 14;
 
 /**
  * Scene 01 — the product as the hero artwork.
@@ -101,19 +102,6 @@ export function HeroScene() {
             </a>
           </p>
 
-          {/* Floating: agency custody, centred under the actions. */}
-          <div className="panel-float mx-auto mt-10 hidden w-[19rem] rounded-card p-4 text-left lg:block">
-            <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-              Signing with
-            </p>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
-              <span className="font-mono text-[11px]">0x4A19…9C2E</span>
-            </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-              Delegated, capped, locked to one recipient. Never the root key.
-            </p>
-          </div>
         </div>
 
         {/* The desk. Full container width, centred — the bold centerpiece. */}
@@ -163,6 +151,7 @@ export function HeroScene() {
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5">
                 {run.legs.map((leg, i) => {
                   const isException = leg.tier !== "auto";
+                  if (i >= DESKTOP_CELLS && !isException) return null;
                   const mobileHidden = i >= MOBILE_CELLS && !isException;
                   return (
                     <div
@@ -204,7 +193,12 @@ export function HeroScene() {
               </div>
               {run.legs.length > MOBILE_CELLS + 1 ? (
                 <p className="mt-2 text-center text-[12px] text-muted-foreground sm:hidden">
-                  …and {run.legs.length - MOBILE_CELLS - 1} more routine payouts
+                  …and {run.legs.length - MOBILE_CELLS - 1} more routine payouts, each on its own key
+                </p>
+              ) : null}
+              {run.legs.length > DESKTOP_CELLS + 1 ? (
+                <p className="mt-2 hidden text-center text-[12px] text-muted-foreground sm:block">
+                  …and {run.legs.length - DESKTOP_CELLS - 1} more routine payouts, each on its own key
                 </p>
               ) : null}
             </div>

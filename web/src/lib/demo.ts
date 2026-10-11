@@ -138,6 +138,7 @@ export const featuredAutoLeg = autoLegs[0];
 export const REPO_URL = "https://github.com/Mofe-Bankole/Flowrail";
 export const DEMO_VIDEO_URL = `${REPO_URL}/blob/main/flowrail-demo.mp4`;
 export const PITCH_DECK_URL = `${REPO_URL}/blob/main/FlowRail-Pitch-Deck.pdf`;
+export const ARCHITECTURE_URL = `${REPO_URL}/blob/main/docs/ARCHITECTURE.md`;
 
 /**
  * Everything the page asserts about the run's size is derived here, never

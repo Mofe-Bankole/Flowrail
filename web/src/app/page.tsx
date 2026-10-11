@@ -3,9 +3,15 @@ import type { Metadata } from "next";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HeroScene } from "@/components/scenes/hero";
 import { MechanismScene } from "@/components/scenes/mechanism";
-import { SurfacesScene, InspectorScene } from "@/components/scenes/surfaces";
+import { InspectorScene } from "@/components/scenes/surfaces";
 import { FanScene, TraceScene } from "@/components/scenes/trust";
-import { FinaleScene } from "@/components/scenes/finale";
+import {
+  CtaScene,
+  QuoteBand,
+  SiteFooter,
+  StatsScene,
+  ValueScene,
+} from "@/components/scenes/story";
 import { REPO_URL } from "@/lib/demo";
 
 export const metadata: Metadata = {
@@ -40,6 +46,9 @@ export default function Landing() {
             FlowRail
           </a>
           <nav className="ml-auto hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+            <a href="#product" className="transition-colors hover:text-foreground">
+              Product
+            </a>
             <a href="#mechanism" className="transition-colors hover:text-foreground">
               How it decides
             </a>
@@ -59,6 +68,7 @@ export default function Landing() {
                 Menu
               </summary>
               <nav className="panel-float absolute right-0 mt-2 flex w-48 flex-col rounded-card p-2 text-sm shadow-[var(--shadow-deep)]">
+                <a href="#product" className="rounded-[8px] px-3 py-2 hover:bg-muted/50">Product</a>
                 <a href="#mechanism" className="rounded-[8px] px-3 py-2 hover:bg-muted/50">How it decides</a>
                 <a href="#evidence" className="rounded-[8px] px-3 py-2 hover:bg-muted/50">Evidence</a>
                 <a href="/app" className="rounded-[8px] px-3 py-2 hover:bg-muted/50">Desk</a>
@@ -72,23 +82,17 @@ export default function Landing() {
 
       <main id="top">
         <HeroScene />
+        <ValueScene />
         <MechanismScene />
-        <SurfacesScene />
-        <InspectorScene />
         <FanScene />
+        <StatsScene />
+        <QuoteBand />
+        <InspectorScene />
         <TraceScene />
-        <FinaleScene />
+        <CtaScene />
       </main>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p className="text-sm font-medium">FlowRail</p>
-          <p className="text-sm text-muted-foreground">
-            Moderato testnet · chain 42431 · pathUSD · testnet software, no
-            production funds
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
