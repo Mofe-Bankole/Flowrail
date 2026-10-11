@@ -4,11 +4,15 @@ import { Reveal, StatusDot, Window } from "./primitives";
 import {
   addressStabilityDays,
   autoCapUsd,
+  depositTotal,
+  escalationSummary,
   exceptionLeg,
+  financeCount,
   formatUsd,
   run,
   runTotal,
   sumAmount,
+  unmatchedTotal,
 } from "@/lib/demo";
 
 /**
@@ -26,7 +30,7 @@ import {
 export function FinaleScene() {
   const released = sumAmount(run.legs.filter((l) => l.tier === "auto"));
   const held = exceptionLeg ? Number(exceptionLeg.amount) : 0;
-  const unmatched = run.unresolved.reduce((n, u) => n + Number(u.amount), 0);
+  const unmatched = unmatchedTotal;
 
   // Split the ledger across two columns so forty legs stay a readable block
   // instead of a page-long list. Order is preserved top-left then top-right.
@@ -47,7 +51,7 @@ export function FinaleScene() {
       k: "Held for one signature",
       v: formatUsd(held),
       n: run.counts.finance,
-      note: exceptionLeg ? exceptionLeg.reason : "—",
+      note: exceptionLeg ? escalationSummary(exceptionLeg) : "—",
       tone: "finance" as const,
     },
     {
@@ -126,9 +130,11 @@ export function FinaleScene() {
                 <span className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
                   Reconciled
                 </span>
-                <span className="tnum font-serif text-xl">${runTotal}</span>
+                <span className="tnum font-serif text-xl">${depositTotal}</span>
               </div>
               <p className="mt-1.5 font-mono text-[11px] leading-relaxed text-muted-foreground">
+                ${runTotal} to payees · ${formatUsd(unmatched)} unmatched
+                <br />
                 settled sequentially · one receipt each
               </p>
             </div>
@@ -137,7 +143,7 @@ export function FinaleScene() {
           {/* The run ledger — the artefact itself, every line, dense. */}
           <Reveal delay={120}>
             <Window
-              title={`run ${run.id} · closed`}
+              title={`run ${run.id} · ${financeCount > 0 ? `${financeCount} awaiting signature` : "closed"}`}
               meta={
                 <span className="tnum font-mono text-[11px] text-muted-foreground">
                   {run.legs.length} legs ·{" "}

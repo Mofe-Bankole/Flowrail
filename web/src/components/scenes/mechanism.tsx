@@ -8,11 +8,12 @@ import {
   autoTotal,
   financeCount,
   legCount,
+  depositTotal,
   exceptionLeg,
   formatUsd,
   run,
-  runTotal,
   shortAddress,
+  unmatchedTotal,
 } from "@/lib/demo";
 
 const sample = [...run.legs.slice(0, 5), exceptionLeg].filter(Boolean);
@@ -60,13 +61,13 @@ export function MechanismScene() {
   const [ref, step] = useScrollStep(STEPS.length);
 
   return (
-    <section id="mechanism" className="relative scroll-mt-20 py-24 lg:py-32">
+    <section id="mechanism" className="relative scroll-mt-20 py-20 lg:py-24">
       <div
         ref={ref}
         className="mx-auto grid max-w-[1500px] gap-x-14 gap-y-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]"
       >
         {/* The instrument stays put; only its contents change. */}
-        <div className="order-2 lg:order-1">
+        <div className="order-2 hidden lg:order-1 lg:block">
           {/*
             A sticky wrapper one viewport tall, with the instrument flex-centred
             inside it. Pinning the instrument itself to lg:top-24 left it floating
@@ -82,7 +83,7 @@ export function MechanismScene() {
                   step {step + 1}/4
                 </span>
               }
-              className="w-full min-h-[30rem] shadow-[var(--shadow-deep)]"
+              className="w-full min-h-[26rem] shadow-[var(--shadow-deep)]"
             >
               <div className="p-5 sm:p-6" key={step}>
                 {step === 0 ? <ArrivalState /> : null}
@@ -100,11 +101,11 @@ export function MechanismScene() {
             <li
               key={s.kicker}
               data-step
-              className="flex min-h-[68vh] flex-col justify-center border-t border-border/60 py-10 first:border-t-0 lg:min-h-[74vh]"
+              className="flex flex-col justify-center border-t border-border/60 py-10 first:border-t-0 lg:min-h-[74vh]"
             >
               <div
                 className={`transition dur-standard ease-standard ${
-                  i === step ? "opacity-100" : "opacity-35"
+                  i === step ? "opacity-100" : "opacity-100 lg:opacity-35"
                 }`}
               >
                 <p className="text-[12px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
@@ -123,7 +124,20 @@ export function MechanismScene() {
   scrolled away — as the emptiest stretch of the page. They are annotation
   scale, not a second set of panels: no shadows, no floating offsets.
 */}
-                <StepFigure kind={s.fig} />
+                <div className="hidden lg:block">
+                  <StepFigure kind={s.fig} />
+                </div>
+                {/* Phones have no sticky instrument: each step carries its own state. */}
+                <div className="mt-6 lg:hidden">
+                  <Window title="flowrail · classifier" className="w-full shadow-[var(--shadow-raised)]">
+                    <div className="p-4">
+                      {i === 0 ? <ArrivalState /> : null}
+                      {i === 1 ? <IdentityState /> : null}
+                      {i === 2 ? <RuleState /> : null}
+                      {i === 3 ? <ResultState /> : null}
+                    </div>
+                  </Window>
+                </div>
               </div>
             </li>
           ))}
@@ -149,7 +163,7 @@ function StepFigure({ kind }: { kind: (typeof STEPS)[number]["fig"] }) {
       <div className={wrap}>
         <div className="flex items-baseline justify-between gap-3">
           <span className="font-mono text-muted-foreground">0x91c4…0a3f</span>
-          <span className="tnum text-[12px]">${runTotal}</span>
+          <span className="tnum text-[12px]">${depositTotal}</span>
         </div>
         <p className="mt-1 font-mono text-muted-foreground">
           memo — none · 1 tx · unlabelled
@@ -274,7 +288,7 @@ function ArrivalState() {
           <span className="font-mono text-[12px] text-muted-foreground">
             0x91c4…0a3f
           </span>
-          <span className="tnum font-serif text-3xl">${runTotal}</span>
+          <span className="tnum font-serif text-3xl">${depositTotal}</span>
         </div>
       </div>
       <div className="space-y-1.5 pt-2">
@@ -293,7 +307,8 @@ function ArrivalState() {
         ))}
         {legCount > 6 ? (
           <p className="pt-1 text-[12px] text-muted-foreground">
-            …and {legCount - 6} more, none of them labelled.
+            …and {legCount - 6} more, none of them labelled
+            {unmatchedTotal > 0 ? ` — plus $${formatUsd(unmatchedTotal)} that matches no payee` : ""}.
           </p>
         ) : null}
       </div>
@@ -308,7 +323,7 @@ function IdentityState() {
         Roster match · {run.legs.length}/{run.legs.length} resolved
       </p>
       {sample.map((leg, i) => {
-        const isNew = leg.tier !== "auto";
+        const isNew = leg.findings.includes("unstable_address");
         return (
           <div
             key={leg.payeeId}
@@ -338,7 +353,7 @@ function IdentityState() {
 }
 
 function RuleState() {
-  const overCap = sample.filter((l) => Number(l.amount) > 500);
+  const overCap = sample.filter((l) => Number(l.amount) > autoCapUsd);
   return (
     <div className="space-y-4">
       <p className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
@@ -346,12 +361,12 @@ function RuleState() {
       </p>
       {[
         {
-          label: "Address stable for 7+ days",
-          pass: sample.filter((l) => l.stableForDays >= 7).length,
+          label: `Address stable for ${addressStabilityDays}+ days`,
+          pass: sample.filter((l) => l.stableForDays >= addressStabilityDays).length,
           total: sample.length,
         },
         {
-          label: "Amount at or under $500",
+          label: `Amount at or under $${autoCapUsd}`,
           pass: sample.length - overCap.length,
           total: sample.length,
         },

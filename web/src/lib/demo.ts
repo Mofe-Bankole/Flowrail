@@ -117,6 +117,28 @@ export const autoTotal = formatUsd(sumAmount(autoLegs));
 export const exceptionTotal = exceptionLeg ? formatUsd(Number(exceptionLeg.amount)) : "0.00";
 export const runTotal = formatUsd(sumAmount(run.legs));
 
+/** Invoice lines with no payee on the roster. They arrive in the deposit but are never paid. */
+export const unmatchedTotal = run.unresolved.reduce((n, u) => n + Number(u.amount), 0);
+
+/** The inbound deposit covers every invoice line, matched or not. */
+export const depositTotal = formatUsd(sumAmount(run.legs) + unmatchedTotal);
+
+/** Seconds -> "7 d" / "12 h", for key lifetimes read from the run's policy. */
+export function ttlLabel(seconds: number): string {
+  const hours = seconds / 3600;
+  return hours % 24 === 0 ? `${hours / 24} d` : `${hours} h`;
+}
+
+export const standingKeyTtl = ttlLabel(run.policy.standingKeyTtlSeconds);
+export const oneTimeKeyTtl = ttlLabel(run.policy.oneTimeKeyTtlSeconds);
+
+/** The auto leg the page zooms into when it shows a single key. */
+export const featuredAutoLeg = autoLegs[0];
+
+export const REPO_URL = "https://github.com/Mofe-Bankole/Flowrail";
+export const DEMO_VIDEO_URL = `${REPO_URL}/blob/main/flowrail-demo.mp4`;
+export const PITCH_DECK_URL = `${REPO_URL}/blob/main/FlowRail-Pitch-Deck.pdf`;
+
 /**
  * Everything the page asserts about the run's size is derived here, never
  * written as a literal. The demo ships 40 payees and one escalation, but a
@@ -132,6 +154,22 @@ export const dualCount = run.counts.dual;
 export const autoCapUsd = baseUnitsToUsd(run.policy.autoCap);
 export const dualCapUsd = baseUnitsToUsd(run.policy.dualCap);
 export const addressStabilityDays = run.policy.addressStabilityDays;
+
+/** Why a leg was escalated, in words, from the engine's findings. */
+export function escalationSummary(leg: DemoLeg): string {
+  const parts: string[] = [];
+  if (leg.findings.includes("unstable_address")) {
+    parts.push(`Address stable only ${leg.stableForDays}d, under the ${addressStabilityDays}d bar`);
+  } else {
+    parts.push(`Known address (${leg.stableForDays}d)`);
+  }
+  if (leg.findings.includes("amount_over_dual_cap")) {
+    parts.push(`over the $${dualCapUsd.toLocaleString("en-US")} dual cap`);
+  } else if (leg.findings.includes("amount_over_auto_cap")) {
+    parts.push(`but over the $${autoCapUsd.toLocaleString("en-US")} auto cap`);
+  }
+  return `${parts.join(", ")}.`;
+}
 
 export function heldTotal(): number {
   return exceptionLeg ? Number(exceptionLeg.amount) : 0;
