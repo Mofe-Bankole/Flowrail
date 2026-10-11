@@ -1,7 +1,16 @@
 "use client";
 
 import { Reveal, StatusDot, useInView } from "./primitives";
-import { exceptionLeg, financeCount, formatUsd, legCount, run, runTotal } from "@/lib/demo";
+import {
+  depositTotal,
+  exceptionLeg,
+  financeCount,
+  formatUsd,
+  legCount,
+  run,
+  runTotal,
+  unmatchedTotal,
+} from "@/lib/demo";
 import { proofs } from "@/lib/evidence";
 
 /**
@@ -15,6 +24,8 @@ export function FanScene() {
 
   const W = 1000;
   const H = 520;
+  // Room right of the endpoints for the held leg's label.
+  const LABEL_W = 110;
   const TOP = 26;
   const BOTTOM = H - 26;
   // A one-payee run has no fan: guard the divide rather than emit NaN geometry.
@@ -24,7 +35,7 @@ export function FanScene() {
   const srcY = H / 2;
 
   return (
-    <section className="py-24 lg:py-32">
+    <section className="py-20 lg:py-24">
       <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
         <Reveal className="max-w-xl">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
@@ -42,9 +53,10 @@ export function FanScene() {
 
         <div ref={ref} className="panel-deep mt-14 overflow-hidden rounded-panel px-4 py-6 sm:px-8">
           <div className="mb-4 flex flex-wrap items-baseline gap-x-6 gap-y-1">
-            <span className="tnum font-serif text-2xl">${runTotal}</span>
+            <span className="tnum font-serif text-2xl">${depositTotal}</span>
             <span className="text-[11px] text-muted-foreground">
-              received once, unlabelled
+              received once, unlabelled · ${runTotal} to payees
+              {unmatchedTotal > 0 ? ` · $${formatUsd(unmatchedTotal)} unmatched, not paid` : ""}
             </span>
             <span className="ml-auto flex items-center gap-2 text-[11px]">
               <span className="h-px w-6 bg-emerald-500/70" aria-hidden="true" />
@@ -61,10 +73,10 @@ export function FanScene() {
           </div>
 
           <svg
-            viewBox={`0 0 ${W} ${H}`}
+            viewBox={`0 0 ${W + LABEL_W} ${H}`}
             className="h-auto w-full"
             role="img"
-            aria-label={`One deposit of ${runTotal} dollars splitting into ${run.legs.length} payments, ${run.counts.auto} automatic and one held for signature`}
+            aria-label={`One deposit of ${depositTotal} dollars, ${runTotal} of it splitting into ${run.legs.length} payments, ${run.counts.auto} automatic and one held for signature`}
           >
             {/* paths */}
             {run.legs.map((leg, i) => {
@@ -212,12 +224,13 @@ export function TraceScene() {
   return (
     <section className="pb-24 lg:pb-32">
       <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
-        <Reveal className="max-w-xl">
+        <div className="grid items-start gap-y-14 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-x-14">
+        <Reveal className="max-w-xl lg:sticky lg:top-28">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
             Where it fails
           </p>
           <h2 className="mt-4 font-serif text-4xl leading-[1.04] tracking-[-0.01em] text-balance sm:text-5xl">
-            Three checks the chain runs before FlowRail gets a vote.
+            The chain says no before FlowRail gets a vote.
           </h2>
           <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
             Tempo makes authorization native: caps, expiry, recipient scope as
@@ -227,7 +240,7 @@ export function TraceScene() {
           </p>
         </Reveal>
 
-        <Reveal delay={100} className="panel-deep mt-14 max-w-4xl overflow-hidden rounded-panel">
+        <Reveal delay={100} className="panel-deep overflow-hidden rounded-panel">
           <div className="flex flex-wrap items-center gap-3 border-b border-border/70 px-5 py-3.5">
             <span className="flex items-center gap-2 text-[11px]">
               <StatusDot tone="finance" />
@@ -283,6 +296,7 @@ export function TraceScene() {
             </p>
           </div>
         </Reveal>
+        </div>
       </div>
     </section>
   );

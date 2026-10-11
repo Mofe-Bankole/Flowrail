@@ -19,6 +19,8 @@ export type Proof = {
   tx?: string;
   txLabel?: string;
   at: string;
+  /** The unsafe default FlowRail exists to close, not a control that held. */
+  baseline?: boolean;
 };
 
 export const EXPLORER = "https://explore.testnet.tempo.xyz";
@@ -38,6 +40,7 @@ export const proofs: Proof[] = [
     tx: "0xa809a8dbf4f0f5df47dabf4c348fa9f98f8cbae53a46ddcf5caab3424b7f4715",
     txLabel: "the unauthorised transfer",
     at: "2026-10-01",
+    baseline: true,
   },
   {
     id: "unscoped-auth",
@@ -77,7 +80,7 @@ export const proofs: Proof[] = [
     detail:
       "Rejected with Account keychain error: InvalidCallScope. This is the control the entire custody argument rests on.",
     tx: "0x0b156dd779e0c9ffa64c0ef1a019f98018cead856946c0466ed4d7f4d3c29579",
-    txLabel: "the lock that refused it",
+    txLabel: "the lock",
     at: "2026-10-01",
   },
   {

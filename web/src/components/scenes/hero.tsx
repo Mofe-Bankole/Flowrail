@@ -3,16 +3,25 @@
 import { Window, StatusDot, TierChip } from "./primitives";
 import {
   autoTotal,
+  DEMO_VIDEO_URL,
+  escalationSummary,
   exceptionLeg,
+  featuredAutoLeg,
   formatUsd,
   headline,
   heldTotal,
+  PITCH_DECK_URL,
+  REPO_URL,
   run,
   runTotal,
   shortAddress,
   standfirst,
+  standingKeyTtl,
   sumAmount,
 } from "@/lib/demo";
+
+/** Cells shown on phones before the grid collapses to a count. */
+const MOBILE_CELLS = 5;
 
 /**
  * Scene 01 — the product as the hero artwork.
@@ -47,7 +56,7 @@ export function HeroScene() {
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           <p className="flex items-center justify-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
             <StatusDot tone="auto" />
-            Run {run.id}
+            Payout operations on Tempo
           </p>
           <h1 className="mt-5 font-serif text-[clamp(2.75rem,6.5vw,5.25rem)] leading-[0.94] font-normal tracking-[-0.02em] text-balance">
             {head.legs}
@@ -56,6 +65,11 @@ export function HeroScene() {
           </h1>
           <p className="mt-6 max-w-md text-[15px] leading-relaxed text-muted-foreground">
             {standfirst()}
+          </p>
+          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-foreground/80">
+            FlowRail is payout software for agencies on Tempo. Approve a run
+            once; every payee gets a key that can pay only them, only their
+            amount, and expires on its own.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -72,6 +86,20 @@ export function HeroScene() {
               Watch it decide
             </a>
           </div>
+
+          <p className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
+            <a href={REPO_URL} target="_blank" rel="noreferrer" className="underline decoration-dotted underline-offset-4 hover:text-foreground">
+              GitHub
+            </a>
+            <span aria-hidden="true">·</span>
+            <a href={DEMO_VIDEO_URL} target="_blank" rel="noreferrer" className="underline decoration-dotted underline-offset-4 hover:text-foreground">
+              Demo video
+            </a>
+            <span aria-hidden="true">·</span>
+            <a href={PITCH_DECK_URL} target="_blank" rel="noreferrer" className="underline decoration-dotted underline-offset-4 hover:text-foreground">
+              Pitch deck
+            </a>
+          </p>
 
           {/* Floating: agency custody, centred under the actions. */}
           <div className="panel-float mx-auto mt-10 hidden w-[19rem] rounded-card p-4 text-left lg:block">
@@ -134,11 +162,12 @@ export function HeroScene() {
             <div className="surface-sunken p-3 sm:p-4">
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5">
                 {run.legs.map((leg, i) => {
-                  const isException = leg.tier === "finance";
+                  const isException = leg.tier !== "auto";
+                  const mobileHidden = i >= MOBILE_CELLS && !isException;
                   return (
                     <div
                       key={leg.payeeId}
-                      className="animate-cell-in group relative overflow-hidden rounded-[10px] border border-border/70 bg-card px-3 py-3 transition dur-standard ease-standard hover:z-10 hover:-translate-y-0.5 hover:shadow-[var(--shadow-raised)]"
+                      className={`${mobileHidden ? "hidden sm:block " : ""}animate-cell-in group relative overflow-hidden rounded-[10px] border border-border/70 bg-card px-3 py-3 transition dur-standard ease-standard hover:z-10 hover:-translate-y-0.5 hover:shadow-[var(--shadow-raised)]`}
                       style={{ animationDelay: `${Math.min(i * 16, 700)}ms` }}
                     >
                       <span
@@ -173,6 +202,11 @@ export function HeroScene() {
                   );
                 })}
               </div>
+              {run.legs.length > MOBILE_CELLS + 1 ? (
+                <p className="mt-2 text-center text-[12px] text-muted-foreground sm:hidden">
+                  …and {run.legs.length - MOBILE_CELLS - 1} more routine payouts
+                </p>
+              ) : null}
             </div>
 
             {/* Toolbar */}
@@ -196,37 +230,32 @@ export function HeroScene() {
                 ${autoTotal} cleared without a human
               </span>
             </div>
-
-            {/* The sweep: a lock landing on the interface. */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-transparent via-primary/8 to-transparent"
-            />
           </Window>
 
           {/* Floating: the one signature, overlapping the window's lower edge. */}
           {exceptionLeg ? (
-            <div className="panel-float absolute -bottom-8 left-2 w-[17rem] rounded-card p-4 shadow-[var(--shadow-deep)] sm:-left-6 lg:left-8">
+            <div className="panel-float relative z-10 mx-auto -mt-3 w-[17rem] rounded-card p-4 shadow-[var(--shadow-deep)] sm:mr-6 sm:ml-auto">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
                   Escalated
                 </p>
-                <TierChip tier="finance" />
+                <TierChip tier={exceptionLeg.tier} />
               </div>
               <p className="mt-2 text-sm font-medium">{exceptionLeg.name}</p>
               <p className="tnum mt-1 font-serif text-2xl text-amber-600 dark:text-amber-400">
                 ${formatUsd(Number(exceptionLeg.amount))}
               </p>
               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                New address, over the auto cap. A person signs once — the key
-                still cannot pay anyone else.
+                {escalationSummary(exceptionLeg)} One approval releases it — the
+                key still cannot pay anyone else.
               </p>
               <div className="mt-3 flex items-center gap-2 border-t border-border/70 pt-3">
-                <span className="font-serif text-[13px] italic text-foreground/80">
-                  {exceptionLeg.name}
+                <span className="text-[11px] text-muted-foreground">
+                  {exceptionLeg.tier === "dual" ? "Two approvers" : "Finance approver"}
                 </span>
-                <span className="ml-auto text-[10px] text-muted-foreground">
-                  signed
+                <span className="ml-auto flex items-center gap-1.5 text-[10px] text-amber-600 dark:text-amber-400">
+                  <StatusDot tone="finance" />
+                  awaiting signature
                 </span>
               </div>
             </div>
@@ -235,14 +264,14 @@ export function HeroScene() {
           {/* Floating: the delegated key, off the right edge. */}
           <div className="panel-float absolute -top-6 right-4 hidden w-[15rem] rounded-card p-3.5 md:block lg:-right-4">
             <p className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-              Auto key
+              Auto key · {featuredAutoLeg?.name ?? "one payee"}
             </p>
             <dl className="mt-1.5 divide-y divide-border/60">
               {[
-                ["cap", "$500 / key"],
-                ["lifetime", "12 h"],
+                ["cap", featuredAutoLeg ? `$${formatUsd(Number(featuredAutoLeg.amount))} · this payout` : "this payout"],
+                ["lifetime", standingKeyTtl],
                 ["selector", "transfer"],
-                ["recipient", "locked"],
+                ["recipient", featuredAutoLeg ? `locked · ${shortAddress(featuredAutoLeg.address)}` : "locked"],
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between py-1 text-[10px]">
                   <dt className="text-muted-foreground">{k}</dt>

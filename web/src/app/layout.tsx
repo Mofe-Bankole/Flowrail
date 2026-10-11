@@ -15,9 +15,10 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://flowrail.vercel.app"),
   title: "FlowRail — payout operations on Tempo",
   description:
-    "Payout operations for businesses on Tempo. You define the rules once; every run is checked against them, batched into one transaction, and reconciled against a stablecoin rail.",
+    "Payout operations for agencies on Tempo. You define the rules once; every run is checked against them, paid out leg by leg on per-recipient keys the chain enforces, and reconciled with a receipt for each payout.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

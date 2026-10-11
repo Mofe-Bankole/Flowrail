@@ -4,10 +4,17 @@ import type { ReactNode } from "react";
 
 import { Reveal, StatusDot, TierChip, Window } from "./primitives";
 import {
+  addressStabilityDays,
+  autoCapUsd,
   exceptionLeg,
+  featuredAutoLeg,
+  financeCount,
   formatUsd,
+  oneTimeKeyTtl,
   run,
   shortAddress,
+  standingKeyTtl,
+  unmatchedTotal,
 } from "@/lib/demo";
 import { explorerTx, proofs } from "@/lib/evidence";
 
@@ -41,7 +48,6 @@ function Orbit({
 
 export function SurfacesScene() {
   const ledger = run.legs.slice(0, 11);
-  const settled = ledger.filter((l) => l.tier === "auto");
 
   // Eight satellites, two per side per row, ringing the ledger.
   const ring = [
@@ -56,11 +62,11 @@ export function SurfacesScene() {
   ] as const;
 
   return (
-    <section className="py-24 lg:py-32">
+    <section className="py-20 lg:py-24">
       <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
         <Reveal className="mx-auto max-w-xl text-center">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-            One run, nine surfaces
+            Every surface, one run
           </p>
           <h2 className="mt-4 font-serif text-4xl leading-[1.04] tracking-[-0.01em] text-balance sm:text-5xl">
             Everything a payout touches, around one ledger.
@@ -96,7 +102,7 @@ export function SurfacesScene() {
                 </span>
                 <span className="h-3 w-px bg-border" aria-hidden="true" />
                 <span className="tnum text-[11px]">
-                  {settled.length} of {ledger.length} shown
+                  {ledger.length} of {run.legs.length} shown
                 </span>
                 <span className="ml-auto flex items-center gap-1.5 text-[10px] text-muted-foreground">
                   <StatusDot tone="auto" />
@@ -206,10 +212,10 @@ export function SurfacesScene() {
             </p>
             <dl className="mt-3 space-y-1.5">
               {[
-                ["auto cap", "$500"],
-                ["address tenure", "7 days"],
-                ["one-time key", "12 h"],
-                ["standing key", "7 d"],
+                ["auto cap", `$${autoCapUsd}`],
+                ["address tenure", `${addressStabilityDays} days`],
+                ["one-time key", oneTimeKeyTtl],
+                ["standing key", standingKeyTtl],
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between gap-3 text-[10px]">
                   <dt className="text-muted-foreground">{k}</dt>
@@ -246,7 +252,7 @@ export function SurfacesScene() {
             <p className="mt-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
               classify → {run.legs.length} legs
               <br />
-              approve → 1 signature
+              approve → {financeCount} signature{financeCount === 1 ? "" : "s"}
               <br />
               settle → 1 receipt / leg
             </p>
@@ -265,9 +271,7 @@ export function SurfacesScene() {
                 </span>
               </div>
               <p className="tnum mt-1 text-[11px] text-muted-foreground">
-                ${formatUsd(
-                  run.unresolved.reduce((n, u) => n + Number(u.amount), 0),
-                )}{" "}
+                ${formatUsd(unmatchedTotal)}{" "}
                 unmatched
               </p>
             </div>
@@ -288,8 +292,25 @@ export function InspectorScene() {
   const accepted = proofs.filter((p) => p.outcome === "accepted");
   const rejected = proofs.filter((p) => p.outcome === "reverted");
 
+  const leg = featuredAutoLeg;
+  const issued = new Date(run.generatedAt);
+  const expires = new Date(issued.getTime() + run.policy.standingKeyTtlSeconds * 1000);
+  const stamp = (d: Date) => `${d.toISOString().slice(0, 19).replace("T", " ")} UTC`;
+  const keyAmount = leg ? formatUsd(Number(leg.amount)) : "—";
+  const keyRecipient = leg ? shortAddress(leg.address) : "—";
+  const keyRows: [string, string, boolean?][] = [
+    ["payee", leg ? `${leg.name} · ${leg.role}` : "—"],
+    ["recipient", `${keyRecipient} · locked, 1 address`, true],
+    ["authorised amount", `$${keyAmount} pathUSD · exactly this payout`],
+    ["lifetime", `${standingKeyTtl} · standing`],
+    ["tier", leg ? `${leg.tier} · ${leg.reason}` : "—"],
+    ["selector", "transfer"],
+    ["issued", stamp(issued)],
+    ["expires", stamp(expires)],
+  ];
+
   return (
-    <section id="evidence" className="scroll-mt-20 py-24 lg:py-32">
+    <section id="evidence" className="scroll-mt-20 py-20 lg:py-24">
       <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
         <Reveal className="max-w-xl">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
@@ -300,7 +321,7 @@ export function InspectorScene() {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:gap-8">
+        <div className="mt-14 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:gap-8">
           {/* The key, in full */}
           <Reveal className="panel-deep overflow-hidden rounded-panel">
             <div className="border-b border-border/70 px-5 py-3.5">
@@ -309,17 +330,7 @@ export function InspectorScene() {
               </p>
             </div>
             <dl className="divide-y divide-border/60 px-5 py-2">
-              {[
-                ["address", "0x7c41…e90b", true],
-                ["payee", "Nia Okonjo · Editor"],
-                ["authorised amount", "$500.00 pathUSD"],
-                ["lifetime", "12 h · one-time"],
-                ["recipient", "locked · 1 address"],
-                ["selector", "transfer"],
-                ["issued", "2026-10-01 09:14:22 UTC"],
-                ["expires", "2026-10-01 21:14:22 UTC"],
-                ["spendable now", "$0.00 · not yet settled"],
-              ].map(([k, v, mono]) => (
+              {keyRows.map(([k, v, mono]) => (
                 <div key={k as string} className="flex items-baseline justify-between gap-4 py-2">
                   <dt className="shrink-0 text-[11px] text-muted-foreground">{k}</dt>
                   <dd
@@ -332,10 +343,10 @@ export function InspectorScene() {
             </dl>
             <div className="border-t border-border/70 px-5 py-3">
               <p className="font-mono text-[10px] text-muted-foreground">
-                authorizeKey(addr, ONE_TIME, 500e6, true, [])
+                authorizeKey(key, expiry: +{standingKeyTtl}, limits: [pathUSD, {keyAmount}])
               </p>
               <p className="mt-1 font-mono text-[10px] text-muted-foreground">
-                setAllowedCalls([transfer → 0x7c41…e90b])
+                setAllowedCalls(key, [transfer → {keyRecipient}])
               </p>
             </div>
           </Reveal>
@@ -349,12 +360,12 @@ export function InspectorScene() {
               <span className="ml-auto flex items-center gap-1.5 text-[10px]">
                 <StatusDot tone="auto" />
                 <span className="tnum">{accepted.length}</span>
-                <span className="text-muted-foreground">held</span>
+                <span className="text-muted-foreground">accepted</span>
               </span>
               <span className="flex items-center gap-1.5 text-[10px]">
                 <span className="size-1.5 rounded-full bg-amber-500" />
                 <span className="tnum">{rejected.length}</span>
-                <span className="text-muted-foreground">refused</span>
+                <span className="text-muted-foreground">reverted</span>
               </span>
             </div>
             <ul className="divide-y divide-border/60">
@@ -366,15 +377,24 @@ export function InspectorScene() {
                   <div className="flex items-start gap-3">
                     <span
                       className={`mt-1 grid size-4 shrink-0 place-items-center rounded-full text-[9px] font-bold ${
-                        p.outcome === "accepted"
-                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                          : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                        p.baseline
+                          ? "bg-destructive/10 text-destructive"
+                          : p.outcome === "accepted"
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                            : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
                       }`}
                     >
-                      {p.outcome === "accepted" ? "✓" : "!"}
+                      {p.baseline ? "!" : p.outcome === "accepted" ? "✓" : "✕"}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[12px] leading-snug">{p.claim}</p>
+                      <p className="text-[12px] leading-snug">
+                        {p.claim}
+                        {p.baseline ? (
+                          <span className="ml-2 rounded-pill bg-destructive/10 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-destructive uppercase">
+                            the gap we close
+                          </span>
+                        ) : null}
+                      </p>
                       <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
                         {p.attempt}
                       </p>
@@ -390,6 +410,7 @@ export function InspectorScene() {
                       rel="noreferrer"
                       className="mt-1.5 ml-7 inline-block font-mono text-[10px] text-muted-foreground underline decoration-dotted underline-offset-2 transition dur-fast ease-standard group-hover:text-foreground"
                     >
+                      {p.outcome === "reverted" ? "reverts leave no hash · constraint: " : ""}
                       {p.txLabel} · {p.tx.slice(0, 14)}…
                     </a>
                   ) : null}
