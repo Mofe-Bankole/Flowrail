@@ -216,6 +216,105 @@
   }
 }
 
+/* Landing page motion. Each is a one-shot entrance; nothing loops but the
+   held key's pulse and the source halo, both of which stop under reduced motion. */
+@layer utilities {
+  .animate-rise {
+    animation: panel-enter 700ms var(--ease-entrance) backwards;
+  }
+
+  .animate-draw {
+    stroke-dashoffset: 1;
+    animation: draw-path 900ms var(--ease-standard) forwards;
+  }
+
+  .animate-key-on {
+    animation: key-on 520ms var(--ease-entrance) backwards;
+  }
+
+  .animate-held {
+    animation:
+      key-on 520ms var(--ease-entrance) backwards,
+      held-pulse 2.4s ease-in-out 2.8s infinite;
+  }
+
+  .animate-halo {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: halo 2.6s ease-out 1.2s infinite;
+  }
+
+  .animate-settle {
+    animation: settle 420ms var(--ease-entrance) both;
+  }
+
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--secondary);
+    accent-color: var(--primary);
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow-raised);
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+
+  .range::-webkit-slider-thumb:hover {
+    transform: scale(1.12);
+  }
+
+  .range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow-raised);
+  }
+}
+
+@keyframes key-on {
+  from {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes held-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-amber-500) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklch, var(--color-amber-500) 0%, transparent);
+  }
+}
+
+@keyframes halo {
+  from {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
 @keyframes cell-in {
   from {
     opacity: 0;
