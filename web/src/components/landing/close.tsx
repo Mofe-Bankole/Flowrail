@@ -209,9 +209,18 @@ export function Footer() {
           <a href={ARCHITECTURE_URL} className="hover:text-foreground">Architecture</a>
           <a href={PITCH_DECK_URL} className="hover:text-foreground">Pitch deck</a>
         </nav>
-        <p className="tnum text-[12px] text-muted-foreground">
-          Moderato testnet · chain 42431 · no production funds
-        </p>
+        <div className="tnum text-[12px] text-muted-foreground md:text-right">
+          <p>Moderato testnet · chain 42431 · no production funds</p>
+          <p className="mt-1">
+            Page updated after the 12 Oct submission ·{" "}
+            <a
+              href={`${REPO}/tree/submission-2026-10-12`}
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              judged version
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );

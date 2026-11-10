@@ -16,6 +16,13 @@ Payouts leave as a batch, and every payout links back to on-chain proof.
 
 </div>
 
+> **Judging note — Crypto World's Fair.** The submitted entry is the tag
+> [`submission-2026-10-12`](https://github.com/Mofe-Bankole/Flowrail/tree/submission-2026-10-12)
+> (commit `f251a7f`, 2026-10-11), the last commit before the 2026-10-12 23:59 PT deadline.
+> Commits after that date are post-submission work and are not part of the judged entry.
+> The live landing page at flowrail.vercel.app was rebuilt on 2026-11-10; the desk at `/app`
+> and the engine are unchanged from submission.
+
 ---
 
 ## Try it
