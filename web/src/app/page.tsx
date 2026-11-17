@@ -8,6 +8,7 @@ import { Rule } from "@/components/landing/rule";
 import { RunExplorer } from "@/components/landing/run";
 import { Proof, Plainly } from "@/components/landing/proof";
 import { Build, Closing, Demo, Footer } from "@/components/landing/close";
+import { Waitlist } from "@/components/landing/waitlist";
 import { headline } from "@/lib/demo";
 
 const head = headline();
@@ -56,6 +57,7 @@ export default function Landing() {
         <Plainly />
         <Demo />
         <Build />
+        <Waitlist />
         <Closing />
       </main>
       <Footer />
